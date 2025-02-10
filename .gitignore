@@ -1,3 +1,14 @@
+# Ignorer le fichier README.md
+README.md
+
+# Ignorer le fichier de licence
+LICENSE
+
+# Ignorer les screenshots (ou d'autres images, s'ils sont dans un dossier spécifique)
+*.png
+*.jpg
+*.jpeg
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
