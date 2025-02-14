@@ -48,7 +48,7 @@ chmod +x install.sh && ./install.sh
 🔥 Lancer CyberTool
 
 ./cyber-tool
-
+```
 
 ---
 
