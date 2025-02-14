@@ -8,9 +8,8 @@
 # ⚡💀 CYBERTOOL - L'ULTIME SUITE DE PENTESTING & SÉCURITÉ 🚀  
 
 🔥 **Version :** 2.1.3  
-📅 **Dernière mise à jour :** $(date +"%d/%m/%Y")  
-🔍 **Développé par :** Karim | **YesWeHack**  
-📩 **Contact & Support :** [📸 Instagram](https://instagram.com/ton_instagram) | [📧 Email](mailto:ton_email@example.com)  
+📅 **Dernière mise à jour :** (14/02/2025) 
+📩 **Contact & Support :** [📸 Instagram](https://instagram.com/karim_al_korama_93) | [📧 Email](mailto:gallotiankarim@gmail.com)  
 
 ![GitHub Gif](https://github.com/Karim93160/cyber-tool/blob/9540be01c217d7e26823fad034bfe1c57d77d282/l378mmWnv7Gjngd9e.gif)
 
@@ -109,12 +108,12 @@ Les utilisateurs peuvent proposer :
 
 🔥 CONTACT & SUPPORT
 
-📌 Besoin d'aide ? Une question sur l'outil ? Une idée à partager ?
+📌 Besoin d'aide ? Une question sur l'outil ? Une idée à partager ? 🌐
 
 📩 📸 Instagram
 📧 📧 Email
 
-🌍 Développé avec passion par Karim | YesWeHack
+🔍 **Développé par :** Karim
 
 
 ---
