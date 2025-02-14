@@ -40,8 +40,7 @@ L’auteur **décline toute responsabilité** en cas de mauvaise utilisation.
 ### 📥 **Cloner le projet**  
 🔧 Installation automatique
 ```bash
-git clone https://github.com/ton_utilisateur/ton_repo.git && cd ton_repo
-
+git clone https://github.com/karim93160/cyber-tool.git && cd cyber-tool
 
 chmod +x install.sh && ./install.sh
 
