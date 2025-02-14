@@ -1,122 +1,122 @@
-# 🔥 **CyberTool - Outil de Pentesting & Cybersécurité** 💀  
-
 ![GitHub Stars](https://img.shields.io/github/stars/karim93160/cyber-tool?color=gold&style=for-the-badge)  
 ![GitHub Forks](https://img.shields.io/github/forks/karim93160/cyber-tool?color=blue&style=for-the-badge)  
 ![GitHub Issues](https://img.shields.io/github/issues/karim93160/cyber-tool?color=red&style=for-the-badge)  
-![GitHub License](https://img.shields.io/github/license/karim93160/cyber-tool?color=green&style=for-the-badge)  
-![CyberTool Attack](https://github.com/karim93160/cyber-tool/assets/hacker_attack.gif)
+![GitHub License](https://img.shields.io/github/license/karim93160/cyber-tool?color=green&style=for-the-badge)
+![GitHub Gif]
 
-> **Un outil puissant pour l’audit de sécurité, le pentesting et l'analyse de vulnérabilités.**  
-> 🛠️ **Fonctionne sur Termux & Linux** | 🔥 **Cyberpunk UI Animée**  
+# ⚡💀 CYBERTOOL - L'ULTIME SUITE DE PENTESTING & SÉCURITÉ 🚀  
 
----
-
-## 🚀 **📌 SECTIONS STRICTEMENT GITHUB (Visible sur GitHub uniquement)**  
-
-### 📂 **Arborescence du Dépôt**  
-```plaintext
-cyber-tool/
-│── cyber-tool              # Script Principal d’Exécution  
-│── data/                   # Dossier de Données  
-│   ├── banners/            # Bannières ASCII & Graphiques  
-│   ├── configs/            # Fichiers de Configuration  
-│── requirements.txt        # Dépendances Python  
-│── README.md               # Documentation  
-└── LICENSE                 # Licence Open Source  
-```
-
-### 🖥️ **Interface Cyberpunk Animée & Interactive**  
-
-🔥 **Tableau Animé des Fonctionnalités**  
-🔥 **Effets CyberPunk & Chargements Dynamiques**  
-🔥 **Exécution en Temps Réel avec Logs Structurés**  
-
-![CyberTool Preview](https://github.com/karim93160/cyber-tool/assets/banner.gif)  
+🔥 **Version :** 2.1.3  
+📅 **Dernière mise à jour :** $(date +"%d/%m/%Y")  
+🔍 **Développé par :** Karim | **YesWeHack**  
+📩 **Contact & Support :** [📸 Instagram](https://instagram.com/ton_instagram) | [📧 Email](mailto:ton_email@example.com)  
 
 ---
 
-## 🛠️ **📂 SECTIONS STRICTEMENT CLONABLES & UTILISABLES EN LOCAL**  
+# 🏴‍☠️ **💀 ETHICAL HACKING ONLY**  
 
-### 📌 **Installation & Prérequis**  
+🚨 **CyberTool est destiné exclusivement aux professionnels de la cybersécurité, aux chercheurs en sécurité et aux pentesters ÉTHIQUES.**  
+Son utilisation doit respecter **les lois et régulations** en vigueur dans votre pays. **Tout usage non autorisé est STRICTEMENT interdit.**  
 
-💻 **Systèmes Compatibles** : **Termux (Android) & Linux (Debian, Ubuntu, Kali)**  
-📌 **Toutes les dépendances sont installées automatiquement**  
+💀 **Seuls les professionnels qualifiés** peuvent utiliser CyberTool **dans un cadre légal**, avec une **autorisation explicite** du propriétaire de la cible.  
+L’auteur **décline toute responsabilité** en cas de mauvaise utilisation.  
 
+---
+
+## 📂 **STRUCTURE DU PROJET**  
+
+📂 **CyberTool/**  
+├── 📜 **README.md** → Documentation complète  
+├── ⚙️ **cyber-tool** → Script principal  
+├── 📁 **data/** → Ressources internes  
+│   ├── 🖼️ **banners/** → Fichiers des bannières d'affichage  
+├── 🛠️ **install.sh** → Installation automatique  
+├── 📜 **requirements.txt** → Liste des dépendances  
+
+---
+
+## 🚀 **INSTALLATION & UTILISATION**  
+
+### 📥 **Cloner le projet**  
 ```bash
-# 1️⃣ Cloner le dépôt Git
-git clone https://github.com/karim93160/cyber-tool.git
-cd cyber-tool
+git clone https://github.com/ton_utilisateur/ton_repo.git && cd ton_repo
 
-# 2️⃣ Installer les dépendances essentielles
-pip install -r requirements.txt
+🔧 Installation automatique
 
-# 3️⃣ Lancer l’outil !
-chmod +x cyber-tool
+chmod +x install.sh && ./install.sh
+
+🔥 Lancer CyberTool
+
 ./cyber-tool
-```
+
 
 ---
 
-## 🎮 **Mode d'Utilisation**  
+🛠️ FONCTIONNALITÉS PUISSANTES
 
-1️⃣ **Entrer l'URL cible** :  
-```
-[🎯] Entrez l'URL cible (ex: example.com)
-```
+✅ Reconnaissance & Scanning
+🔹 DNS Lookup | 🔹 Scan des Ports | 🔹 Fingerprinting Web | 🔹 Détection CMS
 
-2️⃣ **Sélectionner des fonctionnalités interactives** :  
+✅ Tests d'Exploitations
+💀 Injection SQL | 💀 XSS Scanner | 💀 LFI/RFI Attacks | 💀 SSRF
 
-[🛠️] Choisissez une fonctionnalité (1-50), 'suivant', 'précédent', ou 'valider'
+✅ Détection de Vulnérabilités
+🔥 Scan CVE en temps réel | 🔥 Exposition de Données Sensibles | 🔥 Bypass Cloudflare | 🔥 JWT Analysis
 
-3️⃣ **Exécution des tests de sécurité** 🔥 :  
+✅ Attaques Web Avancées
+🔑 Scan d’API exposées | 🔑 Bruteforce SSH, FTP | 🔑 Détection de WAF | 🔑 Attaque Password Spraying
 
-[🔥] Lancement des tests et analyses...
+✅ Bypass & Évasion
+🚀 DNS Takeover | 🚀 Énumération Cloud AWS/GCP/Azure | 🚀 Hidden Service Finder | 🚀 WebSocket Analysis
 
-4️⃣ **Consultation des résultats** ✅  
+✅ Fingerprinting & Enumération
+🕵️‍♂️ Énumération des utilisateurs | 🕵️‍♂️ Analyse TLS et certificats | 🕵️‍♂️ Audit de Smart Contract
 
-5️⃣ **Ré-exécution ou fermeture** 👋  
-
----
-
-## 🚀 **Exemples de Commandes de Pentesting**  
-
-🔹 **Scan des ports ouverts**  
-```bash
-./cyber-tool --feature port_scan --target example.com
-```
-
-🔹 **Recherche de sous-domaines**  
-```bash
-./cyber-tool --feature subdomain_enum --target example.com
-```
-
-🔹 **Audit d'un Smart Contract**  
-```bash
-./cyber-tool --feature smart_contract_audit --target example.com
-```
 
 ---
 
-## 🔒 **DISCLAIMER & RESPONSABILITÉ LÉGALE**  
+🌟 VOUS AVEZ UNE IDÉE D'AMÉLIORATION ?
 
-🚨 **CyberTool est strictement destiné à un usage légal.**  
-🚨 **Toute utilisation illégale est de la responsabilité de l’utilisateur final.**  
-🚨 **Utiliser cet outil sans autorisation peut violer les lois en vigueur.**  
+💡 CyberTool évolue continuellement ! Vous souhaitez une nouvelle fonctionnalité ?
+
+📝 Déposez votre demande ici :
+📩 📜 Formulaire de suggestion
+
+📌 Toutes les demandes seront étudiées avec sérieux et pourront être intégrées dans la future version.
+Les utilisateurs peuvent proposer :
+✅ Nouvelles fonctionnalités
+✅ Optimisations et corrections
+✅ Ajout de nouvelles attaques et exploits
+
+📣 Vos retours et suggestions sont essentiels pour faire évoluer CyberTool !
+
 
 ---
 
-## 📞 **Support & Contact**  
+📜 CONDITIONS D'UTILISATION
 
-💬 **GitHub Issues** : [📌 Ouvrir un Ticket](https://github.com/karim93160/cyber-tool/issues)  
-📧 **Email** : gallotiankarim@gmail.com  
-💀 **Développé par Karim**  
+🚨 CyberTool ne doit en aucun cas être utilisé pour :
+❌ Tester des cibles sans autorisation
+❌ Mener des attaques malveillantes
+❌ Accéder illégalement à des systèmes
+
+💀 UTILISATION STRICTEMENT RÉSERVÉE AUX PENTESTERS ÉTHIQUES & CHERCHEURS EN CYBERSÉCURITÉ !
+
+🔴 En lançant ce script, vous acceptez de respecter ces règles.
+
 
 ---
 
-## 🔗 **Licence & Contributions**  
+🔥 CONTACT & SUPPORT
 
-📜 **Licence MIT - Open Source**  
-🛠️ **Contributions Bienvenues !**  
+📌 Besoin d'aide ? Une question sur l'outil ? Une idée à partager ?
 
-🔥 **Version Actuelle :** `CyberTool FIXED`  
-📅 **Dernière Mise à Jour :** `2025-02-12`  
+📩 📸 Instagram
+📧 📧 Email
+
+🌍 Développé avec passion par Karim | YesWeHack
+
+
+---
+
+🏴‍☠️ CyberTool : L'arme ultime des pentesters ÉTHIQUES. 🚀💀
