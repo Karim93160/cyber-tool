@@ -1,0 +1,31 @@
+# 🔹 Modules Essentiels
+requests==2.31.0
+urllib3==2.0.7
+pyyaml==6.0.1
+colorama==0.4.6
+tqdm==4.66.1
+
+# 🔹 Modules pour l'Affichage Interactif
+rich==13.7.0
+pyfiglet==0.8.post1
+pygments==2.17.2
+
+# 🔹 Modules pour le Scraping & Parsing Web
+beautifulsoup4==4.12.3
+html5lib==1.1
+soupsieve==2.6  # ✅ Correction : dépendance de BeautifulSoup4
+
+# 🔹 Modules Réseau & Exploitation
+httpx==0.27.0
+aiohttp==3.9.1
+scapy==2.5.0
+dnspython==2.4.2
+wafw00f==2.1.0
+whois==0.9.27
+
+# 🔹 Modules de Sécurité et Chiffrement (Termux Compatible)
+pycryptodome==3.20.0  # 🔄 Alternative compatible
+
+# 🔹 Modules ajoutés pour les nouvelles fonctionnalités
+websocket-client==1.8.0  # Analyse WebSockets
+pexpect==4.8.0  # Alternative à paramiko
