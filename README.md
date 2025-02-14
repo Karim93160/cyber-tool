@@ -38,18 +38,16 @@ L’auteur **décline toute responsabilité** en cas de mauvaise utilisation.
 ## 🚀 **INSTALLATION & UTILISATION**  
 
 ### 📥 **Cloner le projet**  
+🔧 Installation automatique
 ```bash
 git clone https://github.com/ton_utilisateur/ton_repo.git && cd ton_repo
 
-🔧 Installation automatique
 
 chmod +x install.sh && ./install.sh
 
-🔥 Lancer CyberTool
-
 ./cyber-tool
 ```
-
+🔥 Lancer CyberTool
 ---
 
 🛠️ FONCTIONNALITÉS PUISSANTES
