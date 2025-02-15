@@ -870,7 +870,61 @@ class CyberTool:
                 sleep(0.02)
 
 
-    
+
+
+
+    def run_features(self, feature_name, target):
+        """
+        Exécute la fonctionnalité choisie et affiche la réponse formatée.
+
+        Paramètres :
+            feature_name (str) : Nom de la fonctionnalité à exécuter.
+            target (str)       : URL ou IP cible.
+
+        Retourne :
+            None : Exécute la fonctionnalité et affiche les résultats.
+        """
+        if hasattr(self, feature_name):
+            self.console.print(f"\n[bold cyan]🚀 Exécution de '{feature_name}' sur {target}...[/bold cyan]")
+
+            # Exécution de la fonctionnalité et récupération du résultat
+            response = getattr(self, feature_name)(target)
+
+            # 🔍 Vérification si la réponse est un dictionnaire contenant une structure HTTP
+            if isinstance(response, dict):
+                if "error" in response:
+                    self.console.print(f"[bold red]❌ Erreur : {response['error']}[/bold red]")
+                elif "status" in response and "headers" in response:
+                    self.console.print(f"\n[bold green]✅ Réponse HTTP reçue :[/bold green]")
+                    self.console.print(f"🌍 URL       : {response.get('url', 'N/A')}")
+                    self.console.print(f"📡 Statut    : [bold yellow]{response.get('status', 'N/A')}[/bold yellow]")
+                    self.console.print(f"📜 Headers   : {response.get('headers', 'N/A')}")
+                    self.console.print(f"📄 Contenu   : {response.get('content', 'N/A')[:300]}...")  # Affiche un extrait
+                else:
+                    self.console.print(f"\n[bold blue]🔍 Résultat obtenu :[/bold blue] {response}")
+
+            # Si la réponse est une chaîne de caractères ou autre type de données
+            elif isinstance(response, str):
+                self.console.print(f"\n[bold blue]🔍 Résultat obtenu :[/bold blue] {response}")
+
+            # Si la réponse est une liste (ex: plusieurs résultats DNS)
+            elif isinstance(response, list):
+                self.console.print(f"\n[bold blue]📋 Résultats multiples obtenus :[/bold blue]")
+                for item in response:
+                    self.console.print(f"  ➜ {item}")
+
+            # Cas où la fonctionnalité ne retourne rien
+            else:
+                self.console.print("[bold magenta]ℹ️ Fonctionnalité exécutée, mais aucun résultat retourné.[/bold magenta]")
+
+        else:
+            self.console.print(f"[bold red]❌ Fonctionnalité '{feature_name}' non trouvée.[/bold red]")
+
+
+
+
+
+
 
     def run_tool_static(self):
         """🎮 Affiche le menu statique et permet d'exécuter des fonctionnalités."""
