@@ -40,11 +40,13 @@ L’auteur **décline toute responsabilité** en cas de mauvaise utilisation.
 ### 📥 **Cloner le projet**  
 🔧 Installation automatique
 ```bash
+pkg install git
 git clone https://github.com/karim93160/cyber-tool.git && cd cyber-tool
 
-chmod +x install.sh && ./install.sh
 
-./cyber-tool
+chmod +x install.sh && ./cyber-tool
+
+./install.sh
 ```
 🔥 Lancer CyberTool
 ---
