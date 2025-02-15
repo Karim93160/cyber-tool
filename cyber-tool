@@ -850,10 +850,7 @@ class CyberTool:
 
 
 
-
-
     def display_features_table_hacker(self):
-        """💻 Affiche un tableau interactif des fonctionnalités dans un style hacker-full."""
         from rich.live import Live
         from rich.table import Table
         from time import sleep
@@ -870,23 +867,10 @@ class CyberTool:
         with Live(table, refresh_per_second=10, console=self.console):
             for idx, (feature, description) in enumerate(self.feature_map.items(), start=1):
                 table.add_row(f"[bold cyan]{idx}[/bold cyan]", f"[bold green]{description}[/bold green]")
-                sleep(0.02)  # 🔥 Effet ultra rapide et fluide
-
-        self.console.print(table)  # Fixe le tableau après l'affichage
+                sleep(0.02)
 
 
-    def run_features(self, feature_name, target):
-        """🚀 Exécute une fonctionnalité spécifiée sur une cible donnée."""
-        self.console.print(f"\n[bold magenta]🚀 Exécution de {feature_name} sur {target}...[/bold magenta]")
-        feature_method = getattr(self, feature_name, None)
-
-        if feature_method:
-            result = feature_method(target)
-            self.console.print("\n[bold green]📜 Résultat :[/bold green]")
-            self.console.print(json.dumps(result, indent=4, ensure_ascii=False))
-        else:
-            self.console.print(f"❌ [bold red]Erreur : La fonctionnalité {feature_name} n'est pas disponible.[/bold red]")
-
+    
 
     def run_tool_static(self):
         """🎮 Affiche le menu statique et permet d'exécuter des fonctionnalités."""
