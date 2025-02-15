@@ -5,7 +5,7 @@ echo "🚀 Installation des dépendances pour Cyber-Tool..."
 # 📌 Mise à jour et installation des packages nécessaires
 echo "🔧 Installation des outils système..."
 pkg update -y && pkg upgrade -y
-pkg install -y python python-pip git openssl rust clang cmake make libffi openssl-tool
+pkg install -y python python-pip openssl rust clang cmake make libffi openssl-tool
 
 # 📌 Installation des modules Python
 echo "📦 Installation des modules Python..."
