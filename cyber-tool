@@ -26,7 +26,11 @@ import dns.resolver  # ✅ Recherche DNS
 from Crypto.Cipher import AES  # ✅ Chiffrement (pycryptodome corrigé)
 from bs4 import BeautifulSoup  # ✅ Scraping Web
 import requests  # ✅ Requêtes HTTP
-import jwt  # ✅ Manipulation JSON Web Tokens
+try:
+    import jwt  # ✅ Manipulation JSON Web Tokens
+except ImportError:
+    print("\033[91m[❌] Module 'pyjwt' introuvable ! Installation requise.\033[0m")
+    sys.exit(1)
 import concurrent.futures  # ✅ Multithreading (port scan, bruteforce, etc.)
 
 # 📌 Modules Réseau et Protocoles
