@@ -19,3 +19,5 @@ echo "🔍 Vérification des installations..."
 pip list | grep -E "requests|urllib3|pyyaml|colorama|tqdm|rich|pyfiglet|pygments|beautifulsoup4|html5lib|soupsieve|httpx|aiohttp|scapy|paramiko|smbprotocol|concurrent.futures|pillow"
 
 echo "✅ Installation terminée ! 💀 Cyber-Tool est prêt à l'emploi."
+
+./cyber-tool
