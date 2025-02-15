@@ -105,12 +105,6 @@ Les utilisateurs peuvent proposer :
 
 ---
 
-🔥 CONTACT & SUPPORT
-
-📌 Besoin d'aide ? Une question sur l'outil ? Une idée à partager ? 🌐
-
-📩 📸 Instagram
-📧 📧 Email
 
 🔍 **Développé par :** Karim
 
