@@ -75,8 +75,10 @@ exec ./install.sh
 
 💡 CyberTool évolue continuellement ! Vous souhaitez une nouvelle fonctionnalité ?
 
-📝 Déposez votre demande ici :
-📩 📜 Formulaire de suggestion
+### 📢 **Proposez une amélioration pour Cyber-Tool !**  
+Votre avis compte ! Vous avez une idée pour améliorer Cyber-Tool ? Déposez votre suggestion ici :  
+
+📩 **[Déposer une suggestion sur GitHub Issues](https://github.com/karim93160/issues)**  
 
 📌 Toutes les demandes seront étudiées avec sérieux et pourront être intégrées dans la future version.
 Les utilisateurs peuvent proposer :
