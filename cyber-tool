@@ -10,31 +10,40 @@ import socket
 import hashlib
 import json
 import re
-import base64  # Encodage/Décodage
-import subprocess  # Exécution de commandes systèmes
-import zipfile  # Manipulation de fichiers compressés
-import threading  # Multithreading pour les scans rapides
-import ssl  # Analyse TLS
-import shutil  # Gestion des fichiers
-import logging  # Gestion avancée des logs
-import argparse  # Gestion des arguments en ligne de commande
-from datetime import datetime  # Gestion des timestamps
-from urllib.parse import urlparse  # ✅ Gère les URLs
+import base64  # ✅ Encodage/Décodage
+import subprocess  # ✅ Exécution de commandes systèmes
+import zipfile  # ✅ Manipulation de fichiers compressés
+import threading  # ✅ Multithreading pour les scans rapides
+import ssl  # ✅ Analyse TLS
+import shutil  # ✅ Gestion des fichiers
+import logging  # ✅ Gestion avancée des logs
+import argparse  # ✅ Gestion des arguments en ligne de commande
+from datetime import datetime  # ✅ Gestion des timestamps
+from urllib.parse import urlparse  # ✅ Gestion des URLs
 
 # 📌 Modules de Pentesting & Cybersécurité
-import dns.resolver  # Recherche DNS
-from Cryptodome.Cipher import AES  # Chiffrement
-from bs4 import BeautifulSoup  # Scraping Web
-import requests  # Requêtes HTTP
-import jwt  # Manipulation JSON Web Tokens
+import dns.resolver  # ✅ Recherche DNS
+from Crypto.Cipher import AES  # ✅ Chiffrement (pycryptodome corrigé)
+from bs4 import BeautifulSoup  # ✅ Scraping Web
+import requests  # ✅ Requêtes HTTP
+import jwt  # ✅ Manipulation JSON Web Tokens
 import concurrent.futures  # ✅ Multithreading (port scan, bruteforce, etc.)
 
 # 📌 Modules Réseau et Protocoles
 import scapy.config
 scapy.config.conf.use_pcap = True  # ✅ Évite les erreurs de permissions sous Termux
-from scapy.all import sniff, IP, TCP, UDP  # Analyse Réseau
-from smbprotocol.connection import Connection  # ✅ Connexion SMB via smbprotocol (Termux compatible)
-from ftplib import FTP  # Connexion FTP
+from scapy.all import sniff, IP, TCP, UDP  # ✅ Analyse Réseau
+from ftplib import FTP  # ✅ Connexion FTP
+
+# ✅ Correction de l'importation de smbprotocol
+import sys
+sys.path.append("/data/data/com.termux/files/usr/lib/python3.12/site-packages")
+
+try:
+    from smbprotocol.connection import Connection  # ✅ Connexion SMB
+except ImportError:
+    print("\033[91m[❌] Module 'smbprotocol' introuvable ! Installation requise.\033[0m")
+    sys.exit(1)
 
 # 📌 Modules d'Interaction & Affichage Dynamique
 from rich.console import Console
@@ -47,22 +56,18 @@ from rich.prompt import Confirm, Prompt
 from PIL import Image  # ✅ Extraction de métadonnées d’images
 from io import BytesIO  # ✅ Gestion des flux binaires (images, fichiers, etc.)
 
+# 📌 Bruteforce SSH avec pexpect (remplace paramiko)
+import pexpect  # ✅ Gère les connexions SSH sans paramiko
+
 # 📌 Configuration du Logging
 logging.basicConfig(
     format="%(asctime)s - [%(levelname)s] %(message)s",
     level=logging.INFO,
-    handlers=[
-        logging.StreamHandler(sys.stdout),  # Affiche les logs dans le terminal
-    ],
+    handlers=[logging.StreamHandler(sys.stdout)],  # ✅ Affiche les logs dans le terminal
 )
 
 # 📌 Console Globale pour un Affichage Propre
 console = Console()
-
-# 📌 Bruteforce SSH avec pexpect (remplace paramiko)
-import pexpect  # ✅ Gère les connexions SSH sans paramiko
-
-
 
 
 
