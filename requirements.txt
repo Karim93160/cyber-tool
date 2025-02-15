@@ -13,7 +13,7 @@ pygments==2.17.2
 # 🔹 Modules pour le Scraping & Parsing Web
 beautifulsoup4==4.12.3
 html5lib==1.1
-soupsieve==2.6  # ✅ Correction : dépendance de BeautifulSoup4
+soupsieve==2.6  
 
 # 🔹 Modules Réseau & Exploitation
 httpx==0.27.0
@@ -24,8 +24,9 @@ wafw00f==2.1.0
 whois==0.9.27
 
 # 🔹 Modules de Sécurité et Chiffrement (Termux Compatible)
-pycryptodome==3.20.0  # 🔄 Alternative compatible
+pycryptodome==3.20.0  # ✅ Alternative compatible Termux
 
 # 🔹 Modules ajoutés pour les nouvelles fonctionnalités
 websocket-client==1.8.0  # Analyse WebSockets
-pexpect==4.8.0  # Alternative à paramiko
+pexpect==4.8.0  # Alternative à paramiko (pour SSH bruteforce)
+pillow==10.3.0

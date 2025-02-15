@@ -2,15 +2,20 @@
 
 echo "🚀 Installation des dépendances pour Cyber-Tool..."
 
-# Vérification et installation de pip si absent (MAIS PAS DE MISE À JOUR)
-if ! command -v pip &> /dev/null; then
-    echo "⚠️ pip n'est pas installé. Installation en cours..."
-    python3 -m ensurepip --default-pip
-else
-    echo "✅ pip est déjà installé."
-fi
+# 📌 Mise à jour et installation des packages nécessaires
+echo "🔧 Installation des outils système..."
+pkg update -y && pkg upgrade -y
+pkg install -y python python-pip git openssl rust clang cmake make libffi openssl-tool
 
-# Installation des dépendances principales
-pip install -r requirements.txt --no-cache-dir
+# 📌 Installation des modules Python
+echo "📦 Installation des modules Python..."
+pip install --no-cache-dir -r requirements.txt
 
-echo "✅ Installation terminée ! Cyber-Tool est prêt à l'emploi."
+# 📌 Installation manuelle des modules critiques (Pillow inclus)
+echo "🔧 Installation des dépendances supplémentaires..."
+pip install --no-cache-dir smbprotocol pillow pexpect
+# 📌 Vérification des modules installés
+echo "🔍 Vérification des installations..."
+pip list | grep -E "requests|urllib3|pyyaml|colorama|tqdm|rich|pyfiglet|pygments|beautifulsoup4|html5lib|soupsieve|httpx|aiohttp|scapy|paramiko|smbprotocol|concurrent.futures|pillow"
+
+echo "✅ Installation terminée ! 💀 Cyber-Tool est prêt à l'emploi."
